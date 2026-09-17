@@ -108,7 +108,7 @@
 
     var builds = a.picked.length
       ? a.picked.map(function (p, i) { return { n: '0' + (i + 1), text: p.build }; })
-      : [{ n: '00', text: 'Tick a task above to see what we'd build first.' }];
+      : [{ n: '00', text: "Tick a task above to see what we'd build first." }];
     var ul = $('[data-audit-builds]');
     ul.innerHTML = '';
     builds.forEach(function (b) {
