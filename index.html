@@ -208,8 +208,19 @@
     </div>
     <div class="work">
       <article class="work__feature" data-reveal="1">
-        <div class="placeholder work__image">
-          <img src="assets/work-shift-report.jpg" alt="Shift report app: a generated patrol log open in the review editor" loading="lazy" width="1400" height="767">
+        <div class="demo" data-demo="report" aria-hidden="true">
+          <div class="demo__head">
+            <span class="demo__name">Report agent</span>
+            <span class="demo__status"><i class="demo__led"></i><span data-demo-status>Listening</span></span>
+          </div>
+          <div class="demo__body">
+            <ul class="demo__chat" data-demo-chat></ul>
+            <ul class="demo__log" data-demo-log></ul>
+          </div>
+          <div class="demo__foot">
+            <span class="demo__file">Daily Security Patrolling Log</span>
+            <span class="demo__pill" data-demo-pill>PDF ready</span>
+          </div>
         </div>
         <div class="case-meta">
           <span class="text-accent">Founder build</span><span class="text-muted">Security company</span>
@@ -219,8 +230,25 @@
         <div class="case-result">≈ 16 hrs/day back — the equivalent of two full-time staff · 67 reports a day</div>
       </article>
       <article class="work__feature" data-reveal="2">
-        <div class="placeholder work__image">
-          <img class="img--top" src="assets/work-timesheet.jpg" alt="Google Sheet of guard hours filled in automatically" loading="lazy" width="1400" height="389">
+        <div class="demo" data-demo="sheet" aria-hidden="true">
+          <div class="demo__head">
+            <span class="demo__name">Timesheet agent</span>
+            <span class="demo__status"><i class="demo__led"></i><span data-demo-status>Listening</span></span>
+          </div>
+          <div class="demo__body">
+            <ul class="demo__chat" data-demo-chat></ul>
+            <div class="demo__sheet">
+              <div class="demo__grid" data-demo-grid></div>
+              <div class="demo__total">
+                <span class="demo__total-label">Hours this week</span>
+                <span class="demo__total-value" data-demo-total>0.0</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo__foot">
+            <span class="demo__file">Guard hours · March</span>
+            <span class="demo__pill" data-demo-pill>Row added</span>
+          </div>
         </div>
         <div>
           <div class="case-meta">
@@ -375,6 +403,7 @@
 <script src="js/main.js"></script>
 <script src="js/audit.js"></script>
 <script src="js/book.js"></script>
+<script src="js/demos.js"></script>
 <script type="module" src="js/hero.js"></script>
 <script type="module" src="js/network.js"></script>
 </body>

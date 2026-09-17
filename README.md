@@ -11,6 +11,7 @@ js/theme-init.js    Restores saved light/dark mode before paint (in <head>)
 js/main.js          Light/dark toggle, scroll reveals, contact form
 js/audit.js         Five-minute time audit calculator
 js/book.js          Call request form (progress, segmented choices, cursor glow)
+js/demos.js         Looping mini-UI demos in Selected work
 js/hero.js          Hero 3D scene (Three.js via jsDelivr, ES module)
 js/ribbon.js        Shared 3D helpers (ribbon geometry, streak shader)
 js/network.js       Constellation network behind the contact section
