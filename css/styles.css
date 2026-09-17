@@ -136,7 +136,7 @@ img { max-width: 100%; display: block; }
   padding: 16px var(--gutter);
   background: var(--bg);
   border-bottom: 1px solid var(--line);
-  transition: background 400ms ease;
+  transition: background 400ms ease, opacity 600ms ease;
 }
 .logo {
   font-family: var(--f-display);
@@ -225,10 +225,19 @@ img { max-width: 100%; display: block; }
     #100C10;
 }
 .hero3d a { color: inherit; }
+.hero3d__stage { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .hero3d__canvas {
   position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: 0; display: block;
 }
+/* While holding, the 3D stage takes over the whole viewport */
+.hero3d__backdrop {
+  position: fixed; inset: 0; z-index: -1; background: #100C10;
+  opacity: 0; pointer-events: none; transition: opacity 400ms ease;
+}
+.hero3d.is-journey { z-index: 90; }
+.hero3d.is-journey .hero3d__backdrop { opacity: 1; }
+.hero3d.is-journey .hero3d__stage { position: fixed; }
 .hero3d__scrim {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
@@ -248,6 +257,79 @@ img { max-width: 100%; display: block; }
   60% { transform: translate(-2%, -1%); }
   80% { transform: translate(3%, 3%); }
   100% { transform: translate(0, 0); }
+}
+
+/* Cursor ring (follows the cursor on hover devices; fixed button on touch) */
+.cursor-ring {
+  position: fixed; left: 0; top: 0; z-index: 3;
+  width: 116px; height: 116px; margin: -58px 0 0 -58px;
+  padding: 0; border: 0; background: none; color: var(--ink);
+  pointer-events: none; opacity: 0; transition: opacity 300ms ease;
+  will-change: transform; cursor: pointer;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none;
+}
+.cursor-ring.is-visible { opacity: 1; }
+.cursor-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.cursor-ring__track { fill: none; stroke: rgba(240, 234, 238, 0.35); stroke-width: 0.8; }
+.cursor-ring__progress {
+  fill: none; stroke: var(--accent); stroke-width: 1.8;
+  stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p, 0));
+  filter: drop-shadow(0 0 6px rgba(255, 92, 56, 0.8));
+}
+.cursor-ring__dot {
+  position: absolute; top: 50%; width: 4px; height: 4px; margin-top: -2px;
+  border-radius: 50%; background: var(--ink); transition: transform 300ms ease, background 300ms ease;
+}
+.cursor-ring__dot--l { left: 13%; }
+.cursor-ring__dot--r { right: 13%; }
+.hero3d.is-holding .cursor-ring__dot { transform: scale(1.8); background: var(--accent); }
+.cursor-ring__label {
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: nowrap; transition: opacity 300ms ease;
+}
+.hero3d.is-journey .cursor-ring__label { opacity: 0; }
+.cursor-ring:focus-visible { outline: none; opacity: 1; }
+.cursor-ring:focus-visible .cursor-ring__track { stroke: var(--accent); }
+.hero3d.is-static .cursor-ring { display: none; }
+.hero3d.is-holding { -webkit-user-select: none; user-select: none; }
+
+/* Tagline words revealed during the hold */
+.tagline { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.tagline__word {
+  position: absolute; left: var(--x, 50%); top: var(--y, 50%);
+  transform: translate(-50%, -50%);
+  font-family: var(--f-display); font-weight: 400;
+  font-size: clamp(40px, 7.5vw, 124px); line-height: 1; letter-spacing: -0.035em;
+  white-space: nowrap; color: #fff;
+}
+.tagline__char {
+  display: inline-block; white-space: pre;
+  opacity: 0; filter: blur(14px); transform: translateY(0.3em) scale(0.96);
+  transition: opacity 500ms ease, filter 700ms ease, transform 800ms cubic-bezier(.2, .7, .2, 1);
+  transition-delay: calc(var(--i) * 40ms);
+}
+.tagline__word.is-in .tagline__char { opacity: 1; filter: blur(0); transform: none; }
+.tagline__word.is-out .tagline__char {
+  opacity: 0; filter: blur(10px); transform: translateY(-0.25em);
+  transition-duration: 350ms, 400ms, 450ms; transition-delay: calc(var(--i) * 18ms);
+}
+.tagline__char.is-accent { color: var(--accent); }
+
+/* Hold mode: hand the hero over to the 3D scene */
+.hero3d__content, .hero3d__foot, .hero3d__scrim { transition: opacity 600ms ease; }
+.hero3d.is-journey .hero3d__content,
+.hero3d.is-journey .hero3d__foot { opacity: 0; pointer-events: none; }
+.hero3d.is-journey .hero3d__content a { pointer-events: none; }
+.hero3d.is-journey .hero3d__scrim { opacity: 0.25; }
+body.is-journey .site-header { opacity: 0; pointer-events: none; }
+
+@media (hover: none) {
+  .cursor-ring {
+    position: absolute; left: 50%; top: 28px; width: 92px; height: 92px; margin: 0 0 0 -46px;
+    pointer-events: auto; opacity: 1; transform: none !important;
+  }
+  .hero3d__content { padding-top: 168px; }
 }
 
 /* Content */
@@ -339,6 +421,7 @@ img { max-width: 100%; display: block; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero3d__grain, .marquee__track { animation: none; }
+  .cursor-ring, .tagline { display: none; }
 }
 
 .hero__meta {

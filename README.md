@@ -24,8 +24,12 @@ Fixed palette (Ember red) and font set (Syne / Familjen Grotesk / Azeret Mono), 
 Header has a light/dark toggle (`data-mode` on `<html>`, remembered in localStorage).
 
 ## Hero
-3D ribbons and particles are in `js/hero.js`. Cursor movement powers the scene up; it powers down when the cursor stops (scrolling does the same on touch devices). Tweak ribbon colour (`ribbonMat`), size/position (`resize()`), and responsiveness (`GAIN`, `DECAY`).
-Falls back to the CSS gradient if WebGL is unavailable; renders one still frame for reduced-motion users.
+3D scene in `js/hero.js` (Three.js).
+- Idle: ribbon arches follow the cursor; light streaks run along them now and then.
+- Click and hold (anywhere on the hero; the ring on touch; Space/Enter on the ring): the page fades, the stage goes full-screen and the camera flies through the arches, a slab field and a ring stack while three tagline phrases assemble letter by letter. Letting go rewinds.
+- Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html` (last word of each phrase is highlighted).
+- Timing: hold duration `dt / 11`, rewind `dt / 1.8`, word windows `windows`, word positions `spots`, camera path `keys`.
+Falls back to the CSS gradient if WebGL is unavailable; renders one still frame (no hold) for reduced-motion users.
 Webflow: add the hero markup as an Embed and load `js/hero.js` with `<script type="module">` in page custom code.
 
 ## Webflow CMS (blog)
