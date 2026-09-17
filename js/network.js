@@ -51,6 +51,10 @@ function init(host) {
     }
   }
 
+  // Recentre on the actual spread, so the mass sits in the middle of the frame
+  const centre = nodes.reduce((a, n) => a.add(n.p), new THREE.Vector3()).multiplyScalar(1 / nodes.length);
+  nodes.forEach((n) => n.p.sub(centre));
+
   /* Join each node to its nearest few, without duplicating a link. */
   const links = [];
   const seen = new Set();
@@ -291,12 +295,13 @@ function init(host) {
     follow.x += (pointer.x - follow.x) * k;
     follow.y += (pointer.y - follow.y) * k;
 
+    // Sway rather than spin: a steady yaw would walk the network off to one side
     group.rotation.set(
-      follow.y * 0.14 + Math.sin(t * 0.08) * 0.03,
-      follow.x * 0.26 + t * 0.02,
+      follow.y * 0.12 + Math.sin(t * 0.08) * 0.03,
+      follow.x * 0.2 + Math.sin(t * 0.05) * 0.07,
       0
     );
-    group.position.set(follow.x * 0.6, -follow.y * 0.4 + travel * 0.9, 0);
+    group.position.set(follow.x * 0.35, -follow.y * 0.3 + travel * 0.6, 0);
 
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
