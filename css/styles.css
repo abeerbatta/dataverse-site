@@ -793,3 +793,92 @@ textarea.input { resize: vertical; }
 @media (max-width: 560px) {
   .post-row__thumb { flex-basis: 100%; }
 }
+
+/* ==========================================================================
+   Phone polish — smaller type, one idea per row, more air between blocks.
+   Desktop is untouched: everything here is inside the phone breakpoint.
+   ========================================================================== */
+@media (max-width: 760px) {
+  .page { font-size: 15px; }
+  .section { padding: 64px var(--gutter); }
+
+  /* Hero */
+  .hero3d__title { letter-spacing: -0.03em; }
+  .hero3d__lede { font-size: 16px; margin-bottom: 24px; }
+  .hero3d__actions { gap: 10px; }
+  .hero3d__actions .btn-sq { flex: 1 1 100%; text-align: center; }
+  .hero3d__stats { gap: 6px 20px; margin-top: 22px; }
+  .hero3d__foot { gap: 12px; padding: 18px 0 22px; }
+  .marquee__track { gap: 30px; padding-right: 30px; }
+  .marquee__item { font-size: 15px; font-weight: 500; gap: 30px; }
+
+  /* Section headings */
+  .h2, .section-head__title { font-size: 32px; }
+  .section-head { gap: 14px; margin-bottom: 28px; }
+  .section-head__text { font-size: 15px; }
+  .process-head { gap: 12px; margin-bottom: 28px; }
+  .process-head__title { font-size: 28px; }
+
+  /* Services: number beside the title, copy on its own line */
+  .service { gap: 6px 12px; padding: 24px 0; }
+  .service__num { width: auto; flex: 0 0 auto; padding-top: 3px; }
+  .service__title { flex: 1 1 calc(100% - 46px); font-size: 23px; line-height: 1.2; }
+  .service__text { flex: 1 1 100%; font-size: 15px; margin-top: 2px; }
+
+  /* Process */
+  .step { padding: 26px 20px; }
+  .step__num { font-size: 40px; }
+  .step__title { font-size: 18px; margin: 10px 0 6px; }
+  .step__text { font-size: 15px; }
+
+  /* Time audit */
+  .audit-head { gap: 16px; margin-bottom: 28px; }
+  .audit-head__title { font-size: 34px; }
+  .audit-head__text { font-size: 15px; }
+  .audit { gap: 28px; }
+  .audit__form { gap: 22px; }
+  .chip { font-size: 13px; padding: 8px 14px; }
+  /* label + value on the first row, slider across the second */
+  .task { padding: 13px 0; gap: 8px 12px; }
+  .task__check { order: 1; }
+  .task__label { order: 2; flex: 1 1 auto; font-size: 15px; }
+  .task__hours { order: 3; width: auto; }
+  .task__range { order: 4; flex: 1 1 100%; }
+  .brief { position: static; }
+
+  /* Work */
+  .work-head { gap: 14px; margin-bottom: 28px; }
+  .work-head__note { font-family: var(--f-body); font-size: 14px; letter-spacing: 0; max-width: none; }
+  .work { gap: 34px; }
+  .work__side { gap: 26px; }
+  .case-title, .case-title--lg { font-size: 22px; }
+  .case-text { font-size: 15px; }
+  .case-result { font-size: 11.5px; line-height: 1.5; }
+
+  /* Pricing */
+  .plans { gap: 16px; }
+  .plan, .plan--featured { padding: 24px; margin-top: 0; }
+  .plan__price { font-size: 34px; }
+  .plan__price--sm { font-size: 28px; }
+  .plan__text, .plan__list { font-size: 15px; }
+
+  /* Contact */
+  .contact { padding: 64px var(--gutter); gap: 30px; }
+  .contact__title { font-size: 38px; }
+  .contact__text { font-size: 15px; margin-bottom: 24px; }
+  .site-footer { gap: 10px 22px; padding: 22px var(--gutter); }
+
+  /* Blog */
+  .blog-hero { gap: 16px; }
+  .blog-hero__title { font-size: 40px; }
+  .blog-hero__text { font-size: 15px; }
+  .post-row { gap: 14px; padding: 24px 0; }
+  .post-row__title { font-size: 22px; }
+  .post-row__excerpt { font-size: 15px; }
+  .post-row__arrow { display: none; }
+  .post-header__title { font-size: 34px; }
+  .post-header__summary { font-size: 16px; }
+  .w-richtext { font-size: 16px; }
+  .cta-band { gap: 20px; }
+  .cta-band__title { font-size: 32px; }
+}
