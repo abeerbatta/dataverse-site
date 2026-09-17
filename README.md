@@ -27,7 +27,7 @@ Header has a light/dark toggle (`data-mode` on `<html>`, remembered in localStor
 3D scene in `js/hero.js` (Three.js).
 - Top of page: ribbon arches follow the cursor; light streaks run along them now and then.
 - Scrolling down plays the fly-through on a full-screen stage: the camera passes through the arches, a slab field and a ring stack while three tagline phrases assemble letter by letter. Scrolling up rewinds. When it ends the stage fades out and the rest of the page scrolls in.
-- Length of the fly-through = height of the runway `.hero-journey` in `css/styles.css` (520vh desktop, 420vh mobile).
+- Length of the fly-through = height of the runway `.hero-journey` in `css/styles.css` (300vh desktop, 240vh mobile).
 - Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html` (last word of each phrase is highlighted).
 - Tuning in `js/hero.js`: word windows `windows`, word positions `spots`, camera path `keys`, scroll smoothing `dt * 5`.
 Falls back to the CSS gradient (and no runway) if WebGL is unavailable or for reduced-motion users.

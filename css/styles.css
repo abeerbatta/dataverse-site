@@ -86,8 +86,9 @@ img { max-width: 100%; display: block; }
   position: relative;
 }
 .placeholder > img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
 }
+.placeholder > .img--top { object-position: left top; }
 .placeholder__label {
   font-family: var(--f-mono);
   font-size: 11px;
@@ -291,10 +292,10 @@ img { max-width: 100%; display: block; }
 body.is-journey .site-header { opacity: 0; pointer-events: none; }
 
 /* Scroll runway: the fixed 3D stage plays while this scrolls past */
-.hero-journey { display: none; height: 520vh; }
+.hero-journey { display: none; height: 300vh; }
 .hero-journey.is-ready { display: block; }
 @media (max-width: 760px) {
-  .hero-journey { height: 420vh; }
+  .hero-journey { height: 240vh; }
 }
 
 /* Content */

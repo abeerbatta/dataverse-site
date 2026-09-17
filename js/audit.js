@@ -85,9 +85,9 @@
   function render() {
     var a = audit();
     var money = Math.round(a.saved * (Number(state.rate) || 0) * 48 / 100) * 100;
-    var tier = a.saved < 4 ? 'Starter — from $2,400'
-      : a.saved < 11 ? 'Growth — from $6,500 + $1,200/mo'
-      : 'Custom — priced per phase';
+    var tier = a.saved < 4 ? 'Starter — audit plus one build'
+      : a.saved < 11 ? 'Growth — a connected set of automations'
+      : 'Custom — scoped per phase';
 
     chipsEl.querySelectorAll('.chip').forEach(function (c) {
       c.classList.toggle('is-active', c.dataset.key === state.industry);
