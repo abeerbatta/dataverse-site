@@ -22,6 +22,8 @@
 
 :root {
   --gutter: clamp(18px, 4vw, 56px);
+  /* Page content stops here; the hero stays full-bleed */
+  --content-max: 1180px;
   --section-pad: clamp(56px, 8vw, 104px);
   --f-display: var(--display), sans-serif;
   --f-body: var(--body), sans-serif;
@@ -921,3 +923,24 @@ textarea.input { resize: vertical; }
   .cta-band { gap: 20px; }
   .cta-band__title { font-size: 32px; }
 }
+
+/* ==========================================================================
+   Content width — everything but the hero sits in a centred column, so there is
+   real space at the left and right edges on wide screens.
+   ========================================================================== */
+.section,
+.contact,
+.site-footer,
+.blog-hero,
+.cta-band,
+.post-header,
+.post-body {
+  padding-inline: max(var(--gutter), calc((100% - var(--content-max)) / 2));
+}
+.post-header { max-width: none; }
+.post-cover { margin-inline: max(var(--gutter), calc((100% - var(--content-max)) / 2)); }
+
+/* A little more air between the two columns inside a section head */
+.section-head,
+.work-head,
+.audit-head { column-gap: clamp(32px, 7vw, 110px); }
