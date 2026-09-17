@@ -28,6 +28,19 @@
   var SHEET_CELLS = ['3am–3pm', '3am–3pm', '2pm–3am', '3am–2pm', '3am–3pm'];
   var SHEET_HOURS = [12, 12, 13, 11, 12];
 
+  /* ---------- Card 3: a phone call becomes a booked job ---------- */
+  var CALL_LINES = [
+    ['Caller', "Hi, my water heater's leaking all over the basement."],
+    ['Agent', 'Sorry to hear that. I can get someone out today. What\'s the address?'],
+    ['Caller', '14 Birchmount Road.'],
+    ['Agent', "Got it. Marcus can be there at 2:30 this afternoon. I'll text you a confirmation now."]
+  ];
+  var CALL_CHIPS = [
+    ['Job', 'Water heater leak'],
+    ['Urgency', 'Emergency'],
+    ['Booked', 'Today 2:30 PM']
+  ];
+
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -44,6 +57,12 @@
     var gridEl = card.querySelector('[data-demo-grid]');
     var totalEl = card.querySelector('[data-demo-total]');
     var countEl = card.querySelector('[data-demo-count]');
+    var linesEl = card.querySelector('[data-demo-lines]');
+    var chipsEl = card.querySelector('[data-demo-chips]');
+    var doneEl = card.querySelector('[data-demo-done]');
+    var timerEl = card.querySelector('[data-demo-timer]');
+    var answerEl = card.querySelector('[data-demo-answer]');
+    var tick = null;
     var timers = [];
     var countTimer = null;
 
@@ -54,13 +73,19 @@
       timers.forEach(clearTimeout);
       timers = [];
       clearInterval(countTimer);
-      chatEl.innerHTML = '';
+      clearInterval(tick);
+      if (chatEl) chatEl.innerHTML = '';
+      if (linesEl) linesEl.innerHTML = '';
+      if (chipsEl) chipsEl.innerHTML = '';
+      if (doneEl) doneEl.classList.remove('is-on');
+      if (timerEl) timerEl.textContent = '00:00';
+      if (answerEl) answerEl.textContent = 'Incoming call';
       if (logEl) logEl.innerHTML = '';
       if (gridEl) gridEl.innerHTML = '';
       if (totalEl) totalEl.textContent = '0.0';
       if (countEl) countEl.textContent = '0';
       card.classList.remove('is-done');
-      pill.classList.remove('is-on');
+      if (pill) pill.classList.remove('is-on');
     }
 
     function bubble(m) {
@@ -134,8 +159,71 @@
       at(11000, runSheet);
     }
 
+    function runCall() {
+      clear();
+      status('Ringing');
+      at(900, function () {
+        status('On the call');
+        answerEl.textContent = 'Answered in 2s';
+        card.classList.add('is-working');
+        var secs = 0;
+        tick = setInterval(function () {
+          secs++;
+          timerEl.textContent = '00:' + (secs < 10 ? '0' : '') + secs;
+        }, 900);
+      });
+      CALL_LINES.forEach(function (row, i) {
+        at(1500 + i * 1300, function () {
+          var li = el('li', 'demo__line');
+          li.appendChild(el('span', 'demo__line-who' + (row[0] === 'Agent' ? ' is-agent' : ''), row[0]));
+          li.appendChild(el('span', 'demo__line-text', row[1]));
+          linesEl.appendChild(li);
+          timers.push(setTimeout(function () { li.classList.add('is-in'); }, 20));
+        });
+      });
+      at(6600, function () {
+        clearInterval(tick);
+        card.classList.remove('is-working');
+        status('Job booked');
+        CALL_CHIPS.forEach(function (c, i) {
+          timers.push(setTimeout(function () {
+            var chip = el('span', 'demo__chip' + (i === 2 ? ' is-accent' : ''));
+            chip.appendChild(el('span', 'demo__chip-key', c[0]));
+            chip.appendChild(el('span', 'demo__chip-val', c[1]));
+            chipsEl.appendChild(chip);
+            timers.push(setTimeout(function () { chip.classList.add('is-in'); }, 20));
+          }, i * 320));
+        });
+      });
+      at(7900, function () {
+        doneEl.classList.add('is-on');
+        card.classList.add('is-done');
+      });
+      at(13000, runCall);
+    }
+
     function finalFrame() {
       clear();
+      if (kind === 'call') {
+        status('Job booked');
+        answerEl.textContent = 'Answered in 2s';
+        timerEl.textContent = '00:09';
+        CALL_LINES.forEach(function (row) {
+          var li = el('li', 'demo__line is-in');
+          li.appendChild(el('span', 'demo__line-who' + (row[0] === 'Agent' ? ' is-agent' : ''), row[0]));
+          li.appendChild(el('span', 'demo__line-text', row[1]));
+          linesEl.appendChild(li);
+        });
+        CALL_CHIPS.forEach(function (c, i) {
+          var chip = el('span', 'demo__chip is-in' + (i === 2 ? ' is-accent' : ''));
+          chip.appendChild(el('span', 'demo__chip-key', c[0]));
+          chip.appendChild(el('span', 'demo__chip-val', c[1]));
+          chipsEl.appendChild(chip);
+        });
+        doneEl.classList.add('is-on');
+        card.classList.add('is-done');
+        return;
+      }
       REPORT_MSGS.slice(0, 2).forEach(bubble);
       if (kind === 'report') {
         REPORT_LOG.forEach(function (row) {
@@ -158,28 +246,43 @@
       pill.classList.add('is-on');
     }
 
+    var runners = { report: runReport, sheet: runSheet, call: runCall };
     return {
-      start: function () { (kind === 'report' ? runReport : runSheet)(); },
+      start: function () { (runners[kind] || runReport)(); },
       stop: clear,
       still: finalFrame
     };
   }
 
-  cards.forEach(function (card) {
+  /* A card plays while it is on screen — including horizontally, inside the rail. */
+  function onScreen(node) {
+    var r = node.getBoundingClientRect();
+    return r.right > 40 && r.left < window.innerWidth - 40 && r.bottom > 0 && r.top < window.innerHeight;
+  }
+
+  var runners = cards.map(function (card) {
     var run = makeRunner(card);
-    if (reduced) { run.still(); return; }
-    run.start();
-    // Pause while the card is off screen; it restarts from the top when it comes back.
-    // The observer's first call reports the current state — ignore it so the run isn't
-    // cancelled before it begins.
-    var running = true;
-    var first = true;
-    new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (first) { first = false; return; }
-        if (en.isIntersecting && !running) { running = true; run.start(); }
-        else if (!en.isIntersecting && running) { running = false; run.stop(); }
-      });
-    }, { threshold: 0.2 }).observe(card);
-  });
+    if (reduced) { run.still(); return null; }
+    return { card: card, run: run, playing: false };
+  }).filter(Boolean);
+
+  function sync() {
+    runners.forEach(function (r) {
+      var vis = onScreen(r.card);
+      if (vis && !r.playing) { r.playing = true; r.run.start(); }
+      else if (!vis && r.playing) { r.playing = false; r.run.stop(); }
+    });
+  }
+
+  if (runners.length) {
+    var rail = document.querySelector('.work');
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    if (rail) rail.addEventListener('scroll', sync, { passive: true });
+    // Observers cover the cases a scroll event does not (lazy layout, anchor jumps)
+    runners.forEach(function (r) {
+      new IntersectionObserver(sync, { threshold: 0.2 }).observe(r.card);
+    });
+    sync();
+  }
 })();
