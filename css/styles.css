@@ -1156,12 +1156,11 @@ textarea.input { resize: vertical; }
 }
 
 /* ==========================================================================
-   Content width — everything but the hero sits in a centred column, so there is
-   real space at the left and right edges on wide screens.
+   Content width — everything but the hero, the footer bar and the big wordmark sits in a
+   centred column, so there is real space at the left and right edges on wide screens.
    ========================================================================== */
 .section,
 .contact,
-.site-footer,
 .blog-hero,
 .cta-band,
 .post-header,
