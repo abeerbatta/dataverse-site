@@ -17,7 +17,7 @@ function init(host) {
   } catch (e) {
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
@@ -238,14 +238,13 @@ function init(host) {
     pointer.y = ((e.clientY - r.top) / r.height) * 2 - 1;
   });
 
-  let viewW = 0;
-  let viewH = 0;
+  let needsResize = true;
   function resize() {
+    if (!needsResize) return;
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    if (!w || !h || (w === viewW && h === viewH)) return;
-    viewW = w;
-    viewH = h;
+    if (!w || !h) return;
+    needsResize = false;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -254,12 +253,23 @@ function init(host) {
     nodeMat.uniforms.uScale.value = scale;
     group.scale.setScalar(w < 760 ? 0.78 : 1);
   }
-  new ResizeObserver(resize).observe(host);
+  const ro = new ResizeObserver(() => { needsResize = true; });
+  ro.observe(host);
+  ro.observe(canvas);
 
   let running = false;
   let last = performance.now();
   let t = 0;
+  let travelValue = 0;
   const tmp = new THREE.Vector3();
+
+  function measure() {
+    const r = host.getBoundingClientRect();
+    travelValue = 1 - 2 * ((r.top + r.height / 2) / window.innerHeight);
+  }
+  window.addEventListener('scroll', measure, { passive: true });
+  window.addEventListener('resize', () => { needsResize = true; measure(); });
+  measure();
 
   function frame(now) {
     if (!running) return;
@@ -287,9 +297,8 @@ function init(host) {
     });
     pulseGeo.attributes.position.needsUpdate = true;
 
-    // How far the section has travelled through the viewport, -1 → 1
-    const r = host.getBoundingClientRect();
-    const travel = 1 - 2 * ((r.top + r.height / 2) / window.innerHeight);
+    // How far the section has travelled through the viewport, -1 → 1 (measured on scroll)
+    const travel = travelValue;
 
     const k = Math.min(1, dt * 2);
     follow.x += (pointer.x - follow.x) * k;

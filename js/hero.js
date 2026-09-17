@@ -37,7 +37,8 @@ function init(hero) {
     hero.classList.add('is-static');
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // 1.5 is plenty for a soft, dark scene and roughly halves the pixels on a Retina screen
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -135,7 +136,7 @@ function init(hero) {
   addRibbon(rings, circlePath(7.4, 220), 0.04, 0.05, { len: 5, dur: 2.2 });
 
   /* ---------- Particles ---------- */
-  const P = 420;
+  const P = 240;
   const pPos = new Float32Array(P * 3);
   const pSpeed = new Float32Array(P);
   for (let i = 0; i < P; i++) {
@@ -208,14 +209,13 @@ function init(hero) {
 
   /* ---------- Layout ---------- */
   const layout = { x: 2.8, y: -2.2 };
-  let viewW = 0;
-  let viewH = 0;
+  let needsResize = true;
   function resize() {
+    if (!needsResize) return;
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    if (!w || !h || (w === viewW && h === viewH)) return;
-    viewW = w;
-    viewH = h;
+    if (!w || !h) return;
+    needsResize = false;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -225,7 +225,9 @@ function init(hero) {
     home.scale.setScalar(narrow ? 1.05 : 2);
     if (reduced) render(0, 0);
   }
-  new ResizeObserver(resize).observe(hero);
+  const ro = new ResizeObserver(() => { needsResize = true; });
+  ro.observe(hero);
+  ro.observe(canvas);
 
   /* ---------- Input ---------- */
   let progress = 0; // smoothed fly-through progress, 0 = home view
@@ -249,9 +251,17 @@ function init(hero) {
      path: 0 at the top of the page → 1 when the runway's last screen is reached.
      exit: 0 → 1 over the next ~60% of a screen, as the following section scrolls in. */
   let played = false;
-  function runwayEnd() {
-    return runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+  // Cached so the render loop never forces a layout; refreshed on scroll and resize.
+  let endY = 0;
+  function measure() {
+    if (!runway || played) return;
+    endY = runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
   }
+  function runwayEnd() {
+    return endY;
+  }
+  window.addEventListener('resize', () => { needsResize = true; measure(); });
+  measure();
   function scrollState() {
     if (!runway || played) return { path: 0, exit: 1 };
     const end = runwayEnd();
@@ -264,6 +274,7 @@ function init(hero) {
 
   // Third safety net: a jump (anchor link, End key) can skip the observer's threshold crossing.
   window.addEventListener('scroll', () => {
+    measure();
     if (!played && runway && window.scrollY - runwayEnd() >= window.innerHeight) finish();
   }, { passive: true });
 
