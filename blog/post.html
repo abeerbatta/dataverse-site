@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en-CA" data-mode="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The three automations every trades business should build first — Dataverse</title>
+  <meta name="description" content="Quotes, invoices, and the data you type twice. Where the hours actually go — and the order we'd tackle them in.">
+  <script src="../js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Familjen+Grotesk:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== Header (Webflow: make this a Component) ===== -->
+  <header class="site-header">
+    <a href="../index.html" class="logo">Dataverse<span class="logo__dot"></span></a>
+    <nav class="nav">
+      <a href="../index.html#services">Services</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#audit" class="nav__link--accent">Time audit</a>
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="index.html" class="text-accent" aria-current="page">Blog</a>
+    </nav>
+    <div class="header-tools">
+      <button type="button" class="mode-toggle" data-toggle-mode>Light</button>
+      <a href="../index.html#contact" class="btn btn--primary btn--sm">Book a call</a>
+    </div>
+  </header>
+
+  <!-- ===== Post template =====
+       Webflow: this page becomes the "Blog Posts Template" page.
+       Bind each [data-cms="field-slug"] element to the CMS field of the same slug (see README). -->
+  <article>
+    <header class="post-header">
+      <a href="index.html" class="post-back">← All field notes</a>
+      <div class="post-header__meta">
+        <span class="text-accent" data-cms="category">Field guide</span><span class="text-accent">/</span>
+        <span data-cms="published-date">Sep 10, 2026</span><span class="text-accent">/</span>
+        <span><span data-cms="read-time">6 min</span> read</span>
+      </div>
+      <h1 class="post-header__title" data-cms="name">The three automations every trades business should build first</h1>
+      <p class="post-header__summary" data-cms="excerpt">Quotes, invoices, and the data you type twice. Where the hours actually go — and the order we'd tackle them in.</p>
+    </header>
+
+    <div class="placeholder post-cover" data-cms="cover-image">
+      <span class="placeholder__label">cover image</span>
+    </div>
+
+    <div class="post-body">
+      <aside class="post-body__aside">
+        <div>
+          <div class="eyebrow">Written by</div>
+          <div class="post-author__name" data-cms="author">Dataverse team</div>
+        </div>
+        <div>
+          <div class="eyebrow">Filed under</div>
+          <div class="post-author__name" data-cms="category">Field guide</div>
+        </div>
+      </aside>
+
+      <div class="post-body__content">
+        <!-- Webflow: Rich Text element bound to the "Post Body" field -->
+        <div class="w-richtext" data-cms="post-body">
+          <p>Placeholder body copy. This block shows how every rich-text style renders — headings, lists, quotes, images — so posts written in the Webflow editor look right without extra styling.</p>
+          <h2>1. Quoting &amp; estimates</h2>
+          <p>Most contractors we sit with are pricing jobs after dinner. A phone form that feeds a priced template, plus an automatic follow-up, is usually the single fastest win.</p>
+          <ul>
+            <li>Measurements captured on site, once</li>
+            <li>Pricing rules applied automatically</li>
+            <li>Follow-up sent if the quote isn't opened in 48 hours</li>
+          </ul>
+          <blockquote>The owner stopped doing estimates at 10pm.</blockquote>
+          <h2>2. Invoicing &amp; chasing payment</h2>
+          <p>Raise the invoice when the job is marked complete, then let a polite escalation ladder do the chasing. See our <a href="../index.html#pricing">pricing</a> for how this fits a Starter engagement.</p>
+          <h3>What to watch for</h3>
+          <p>Keep a human on anything over a set amount, and on every first reminder to a new client.</p>
+          <figure>
+            <div class="placeholder" style="aspect-ratio:16/9"><span class="placeholder__label">inline image</span></div>
+            <figcaption>Caption text sits here.</figcaption>
+          </figure>
+          <h2>3. Re-typing data between systems</h2>
+          <p>A single sync so nothing gets typed twice — the fastest payback you own.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-band">
+    <h2 class="cta-band__title">See where your week goes.</h2>
+    <a href="../index.html#audit" class="btn btn--primary btn--lg">Run the five-minute audit</a>
+  </section>
+
+  <!-- ===== Footer (Webflow: make this a Component) ===== -->
+  <footer class="site-footer">
+    <span class="site-footer__brand">Dataverse</span>
+    <span>Automation &amp; AI adoption</span>
+    <span>Canadian owned &amp; operated</span>
+    <span class="site-footer__end">© 2026</span>
+  </footer>
+</div>
+
+<script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en-CA" data-mode="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dataverse — Automation studio for small teams</title>
+  <meta name="description" content="We sit with small teams, find the hours disappearing into copy-paste, and build the automations that give them back.">
+  <script src="js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Familjen+Grotesk:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== Header (Webflow: make this a Component) ===== -->
+  <header class="site-header">
+    <a href="#top" class="logo">Dataverse<span class="logo__dot"></span></a>
+    <nav class="nav">
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#audit" class="nav__link--accent">Time audit</a>
+      <a href="#work">Work</a>
+      <a href="#pricing">Pricing</a>
+      <a href="blog/index.html">Blog</a>
+    </nav>
+    <div class="header-tools">
+      <button type="button" class="mode-toggle" data-toggle-mode>Light</button>
+      <a href="#contact" class="btn btn--primary btn--sm">Book a call</a>
+    </div>
+  </header>
+
+  <!-- ===== Hero (3D scene: js/hero.js — Webflow: canvas + script go in an Embed) ===== -->
+  <section id="top" class="hero3d" data-hero3d>
+    <canvas class="hero3d__canvas" aria-hidden="true"></canvas>
+    <div class="hero3d__scrim" aria-hidden="true"></div>
+    <div class="hero3d__grain" aria-hidden="true"></div>
+
+    <div class="hero3d__content">
+      <div class="hero3d__main">
+        <div class="hero__meta" data-reveal="1">
+          <span>Automation studio</span><span class="text-accent">/</span><span>Canada</span><span class="text-accent">/</span><span>Est. 2026</span>
+        </div>
+        <h1 class="hero3d__title" data-reveal="2">Your work,<br>minus the <span class="text-gradient">busywork</span>.</h1>
+      </div>
+      <div class="hero3d__side" data-reveal="3">
+        <p class="hero3d__lede">We sit with small teams, find the hours disappearing into copy-paste, and build the automations that give them back. No platform to buy. No jargon. Just fewer things you have to remember to do.</p>
+        <div class="hero3d__actions">
+          <a href="#contact" class="btn-sq btn-sq--primary">Book a 30-minute call</a>
+          <a href="#audit" class="btn-sq btn-sq--ghost">Run the five-minute audit</a>
+        </div>
+        <div class="hero3d__stats">
+          <div><span class="hero3d__stat">6–11</span> hrs/week typically recovered</div>
+          <div><span class="hero3d__stat">3 wks</span> audit to first build live</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero3d__foot">
+      <span class="hero3d__foot-label">Built for</span>
+      <div class="marquee">
+        <ul class="marquee__track"><li class="marquee__item">Trades &amp; home services</li><li class="marquee__item">Law &amp; accounting</li><li class="marquee__item">Clinics</li><li class="marquee__item">Brokerages</li><li class="marquee__item">Restaurants</li><li class="marquee__item">Teams of 5–50</li></ul>
+        <ul class="marquee__track" aria-hidden="true"><li class="marquee__item">Trades &amp; home services</li><li class="marquee__item">Law &amp; accounting</li><li class="marquee__item">Clinics</li><li class="marquee__item">Brokerages</li><li class="marquee__item">Restaurants</li><li class="marquee__item">Teams of 5–50</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Services ===== -->
+  <section id="services" class="section">
+    <div class="section-head">
+      <h2 class="h2 section-head__title">Four ways in</h2>
+      <p class="section-head__text">Most engagements start with an audit and end with something running quietly in the background. You can also hire us for one piece.</p>
+    </div>
+    <div class="services">
+      <div class="service" data-reveal="1">
+        <span class="service__num">01</span>
+        <h3 class="service__title">AI readiness audit</h3>
+        <p class="service__text">Two weeks inside your actual week. We map every repetitive handoff, price the time it costs you, and hand back a ranked plan — yours to keep whether or not you hire us for the build.</p>
+      </div>
+      <div class="service" data-reveal="2">
+        <span class="service__num">02</span>
+        <h3 class="service__title">Workflow automation builds</h3>
+        <p class="service__text">Quotes, intake, scheduling, invoicing, follow-up. We build on the tools you already pay for, document it in plain language, and make sure someone on your team can change it without calling us.</p>
+      </div>
+      <div class="service" data-reveal="3">
+        <span class="service__num">03</span>
+        <h3 class="service__title">Custom AI agents</h3>
+        <p class="service__text">An assistant that knows your business — answering after-hours enquiries, triaging email, drafting the reply you'd have written anyway. Scoped narrowly, tested against real transcripts, with a human in the loop where it matters.</p>
+      </div>
+      <div class="service" data-reveal="4">
+        <span class="service__num">04</span>
+        <h3 class="service__title">Data cleanup &amp; integration</h3>
+        <p class="service__text">Nothing automates well on top of four spreadsheets and a CRM nobody trusts. We consolidate, de-duplicate, and connect your systems so the rest of the work actually holds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Process ===== -->
+  <section id="process" class="section section--surface">
+    <div class="process-head">
+      <span class="process-head__eyebrow">How we work</span>
+      <h2 class="process-head__title">Slow on the diagnosis. Fast on the build.</h2>
+    </div>
+    <div class="steps">
+      <div class="step" data-reveal="1">
+        <div class="step__num">01</div>
+        <h3 class="step__title">Sit in the week</h3>
+        <p class="step__text">We shadow the people doing the work, not the org chart. Two or three sessions is usually enough to see where the time goes.</p>
+      </div>
+      <div class="step" data-reveal="2">
+        <div class="step__num">02</div>
+        <h3 class="step__title">Pick the one that pays</h3>
+        <p class="step__text">Everything gets a time cost and an effort estimate. We start with the single automation that clears the most hours for the least risk.</p>
+      </div>
+      <div class="step" data-reveal="3">
+        <div class="step__num">03</div>
+        <h3 class="step__title">Build, hand over, step back</h3>
+        <p class="step__text">Live in weeks, documented in plain language, with your team trained to run it. Stay on retainer only if it's genuinely worth it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Time audit (interactive — Webflow: paste as Embed, see README) ===== -->
+  <section id="audit" class="section">
+    <div class="audit-head">
+      <div class="audit-head__main">
+        <span class="audit-head__badge">● Live tool — no signup</span>
+        <h2 class="audit-head__title">The five-minute<br>time audit</h2>
+      </div>
+      <p class="audit-head__text">Tell us what your week looks like. We'll show you the hours and dollars sitting inside it — and what we'd build first. Your answers become the brief for our call.</p>
+    </div>
+
+    <div class="audit" data-audit>
+      <div class="audit__form">
+        <div>
+          <div class="eyebrow audit__label">01 / Your business</div>
+          <div class="chips" data-audit-industries></div>
+        </div>
+
+        <div>
+          <div class="eyebrow audit__label--tight">02 / Hours a week your team spends on each</div>
+          <div data-audit-tasks></div>
+        </div>
+
+        <div class="fields">
+          <label class="field">
+            <span class="eyebrow field__label">03 / Loaded hourly cost (CAD)</span>
+            <input class="input" type="number" min="15" max="300" step="5" value="55" data-audit-rate>
+          </label>
+          <label class="field field--wide">
+            <span class="eyebrow field__label">04 / The task you'd pay to never do again</span>
+            <input class="input" type="text" placeholder="e.g. re-typing invoices into QuickBooks" data-audit-pain>
+          </label>
+        </div>
+      </div>
+
+      <div class="brief">
+        <div class="eyebrow">Your brief — <span data-audit-industry-label>Trades &amp; home services</span></div>
+        <div class="brief__nums">
+          <div class="brief__num">
+            <div class="brief__hours" data-audit-hours>0.0</div>
+            <div class="brief__caption">hrs/week reclaimable</div>
+          </div>
+          <div class="brief__num">
+            <div class="brief__money" data-audit-money>$0</div>
+            <div class="brief__caption">a year of labour back</div>
+          </div>
+        </div>
+        <div class="brief__body">
+          <div class="eyebrow audit__label">What we'd build first</div>
+          <ul class="builds" data-audit-builds></ul>
+          <div class="brief__tier">Suggested engagement: <span class="text-ink" data-audit-tier></span></div>
+          <a href="mailto:hello@dataverse.ca" class="btn btn--primary btn--block" data-audit-mailto>Send this brief to Dataverse</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Work ===== -->
+  <section id="work" class="section">
+    <div class="work-head">
+      <h2 class="h2">Selected work</h2>
+      <p class="work-head__note">Two builds shipped by our founder before Dataverse; one illustrative scenario, labelled as such.</p>
+    </div>
+    <div class="work">
+      <article class="work__feature" data-reveal="1">
+        <div class="placeholder work__image">
+          <span class="placeholder__label">quote-builder screenshot</span>
+        </div>
+        <div class="case-meta">
+          <span class="text-accent">Founder build</span><span class="text-muted">Renovation contractor · ON</span>
+        </div>
+        <h3 class="case-title case-title--lg">Quotes out the same day, not the same week</h3>
+        <p class="case-text case-text--lg">Site measurements flowed straight from a phone form into a priced quote template and a follow-up sequence. The owner stopped doing estimates at 10pm.</p>
+        <div class="case-result">≈ 8 hrs/week back · quote turnaround 5 days → same day</div>
+      </article>
+      <article class="work__side" data-reveal="2">
+        <div>
+          <div class="case-meta">
+            <span class="text-accent">Founder build</span><span class="text-muted">Physio clinic</span>
+          </div>
+          <h3 class="case-title">Intake forms that file themselves</h3>
+          <p class="case-text">New-patient paperwork parsed, checked, and routed into the practice system before the first appointment.</p>
+          <div class="case-result">≈ 5 hrs/week back · 1 admin role freed for patient care</div>
+        </div>
+        <div>
+          <div class="case-meta">
+            <span class="text-muted">Illustrative scenario</span><span class="text-muted">Restaurant group</span>
+          </div>
+          <h3 class="case-title">An agent that answers at 11pm</h3>
+          <p class="case-text">A booking assistant handling after-hours enquiries and waitlist follow-up, escalating anything unusual to a manager.</p>
+          <div class="case-result">Modelled, not measured — shown to explain the shape of the work</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== Pricing ===== -->
+  <section id="pricing" class="section">
+    <div class="section-head section-head--pricing">
+      <h2 class="h2 section-head__title">What it costs</h2>
+      <p class="section-head__text">Fixed scope, fixed price, quoted after the first call. Ranges below are where projects usually start. All figures CAD.</p>
+    </div>
+    <div class="plans">
+      <div class="plan" data-reveal="1">
+        <div class="plan__name">Starter</div>
+        <div class="plan__price">from $2,400</div>
+        <p class="plan__text">The audit, plus one automation built and handed over.</p>
+        <ul class="plan__list">
+          <li>2-week readiness audit</li>
+          <li>Ranked opportunity map, yours to keep</li>
+          <li>One workflow built &amp; documented</li>
+          <li>Team walkthrough</li>
+        </ul>
+      </div>
+      <div class="plan plan--featured" data-reveal="2">
+        <div class="plan__top">
+          <span class="plan__name">Growth</span>
+          <span class="plan__tag">Most teams</span>
+        </div>
+        <div class="plan__price">from $6,500</div>
+        <p class="plan__text">A connected set of automations, then $1,200/mo to keep it healthy.</p>
+        <ul class="plan__list">
+          <li>Everything in Starter</li>
+          <li>Three to five workflows</li>
+          <li>Data cleanup &amp; system integration</li>
+          <li>One custom agent, scoped tight</li>
+          <li>Optional retainer from $1,200/mo</li>
+        </ul>
+      </div>
+      <div class="plan" data-reveal="3">
+        <div class="plan__name">Custom</div>
+        <div class="plan__price plan__price--sm">Let's scope it</div>
+        <p class="plan__text">Multi-location, regulated, or genuinely messy. Priced per phase.</p>
+        <ul class="plan__list">
+          <li>Multi-site rollout</li>
+          <li>Privacy &amp; records review</li>
+          <li>Staff training programme</li>
+          <li>Fractional AI lead days</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section id="contact" class="contact">
+    <div class="contact__main">
+      <h2 class="contact__title">Tell us where the<br>week goes.</h2>
+      <p class="contact__text">Thirty minutes, no deck. Bring the task you're most tired of doing and we'll tell you honestly whether automation is worth it.</p>
+      <a href="mailto:hello@dataverse.ca" class="contact__email">hello@dataverse.ca</a>
+    </div>
+    <!-- Webflow: replace with a native Form Block using the same classes/field names -->
+    <form class="contact__form" name="contact" data-name="Contact" data-contact-form>
+      <input class="input input--lg" type="text" name="name" placeholder="Name" required>
+      <input class="input input--lg" type="email" name="email" placeholder="Email" required>
+      <textarea class="input input--lg" name="message" rows="4" placeholder="What's eating the most time right now?"></textarea>
+      <button type="submit" class="btn btn--primary contact__submit">Request a call</button>
+      <span class="contact__note">We reply within one business day.</span>
+    </form>
+  </section>
+
+  <!-- ===== Footer (Webflow: make this a Component) ===== -->
+  <footer class="site-footer">
+    <span class="site-footer__brand">Dataverse</span>
+    <span>Automation &amp; AI adoption</span>
+    <span>Canadian owned &amp; operated</span>
+    <span class="site-footer__end">© 2026</span>
+  </footer>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/audit.js"></script>
+<script type="module" src="js/hero.js"></script>
+</body>
+</html>
