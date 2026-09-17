@@ -32,14 +32,23 @@ function init(host) {
   const ACCENT = new THREE.Color('#FF5C38');
 
   /* ---------- Nodes ---------- */
-  const NODES = 30;
+  // Spread over a jittered grid so the network fills the frame instead of clumping
+  const COLS = 7;
+  const ROWS = 5;
   const nodes = [];
-  for (let i = 0; i < NODES; i++) {
-    nodes.push({
-      p: new THREE.Vector3((rand() - 0.5) * 15, (rand() - 0.5) * 8.5, (rand() - 0.5) * 5),
-      accent: rand() < 0.14,
-      phase: rand() * Math.PI * 2
-    });
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (rand() < 0.14) continue; // leave the odd gap
+      nodes.push({
+        p: new THREE.Vector3(
+          -9 + (c + 0.5) * (18 / COLS) + (rand() - 0.5) * 2.2,
+          -5 + (r + 0.5) * (10 / ROWS) + (rand() - 0.5) * 1.6,
+          (rand() - 0.5) * 5
+        ),
+        accent: rand() < 0.14,
+        phase: rand() * Math.PI * 2
+      });
+    }
   }
 
   /* Join each node to its nearest few, without duplicating a link. */

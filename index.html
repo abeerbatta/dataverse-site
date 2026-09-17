@@ -42,7 +42,7 @@
     </nav>
     <div class="header-tools">
       <button type="button" class="mode-toggle" data-toggle-mode>Light</button>
-      <a href="#contact" class="btn btn--primary btn--sm">Book a call</a>
+      <a href="#book" class="btn btn--primary btn--sm">Book a call</a>
     </div>
   </header>
 
@@ -68,7 +68,7 @@
       <div class="hero3d__side" data-reveal="3">
         <p class="hero3d__lede">We find the hours your team loses to copy-paste, and build the automations that give them back. No platform to buy. No jargon.</p>
         <div class="hero3d__actions">
-          <a href="#contact" class="btn-sq btn-sq--primary">Book a 30-minute call</a>
+          <a href="#book" class="btn-sq btn-sq--primary">Book a 30-minute call</a>
           <a href="#audit" class="btn-sq btn-sq--ghost">Run the five-minute audit</a>
         </div>
         <div class="hero3d__stats">
@@ -234,26 +234,74 @@
     </div>
   </section>
 
-  <!-- ===== Contact ===== -->
+  <!-- ===== Book a call (the form lives here now) ===== -->
+  <section id="book" class="section book">
+    <div class="section-head">
+      <h2 class="h2 section-head__title">Book a call</h2>
+      <p class="section-head__text">Thirty minutes with the person who builds these. Bring the task you're most tired of.</p>
+    </div>
+    <div class="book__cols">
+      <div class="book__about">
+        <div class="eyebrow">What happens on it</div>
+        <ol class="book__list">
+          <li>
+            <span class="book__n">01</span>
+            <div>
+              <h3 class="book__title">We ask how the week runs</h3>
+              <p class="book__text">Quotes, intake, scheduling, invoices — how each one moves through your business today.</p>
+            </div>
+          </li>
+          <li>
+            <span class="book__n">02</span>
+            <div>
+              <h3 class="book__title">We map where the hours go</h3>
+              <p class="book__text">Which handoffs repeat, which jobs slip, and what each one costs you.</p>
+            </div>
+          </li>
+          <li>
+            <span class="book__n">03</span>
+            <div>
+              <h3 class="book__title">You leave with a short list</h3>
+              <p class="book__text">The first things worth automating, in order. Yours to keep either way.</p>
+            </div>
+          </li>
+        </ol>
+        <a href="mailto:hello@dataverse.ca" class="book__email">hello@dataverse.ca</a>
+      </div>
+
+      <!-- Webflow: replace with a native Form Block using the same classes/field names -->
+      <form class="book__form" name="contact" data-name="Contact" data-contact-form>
+        <label class="field">
+          <span class="eyebrow field__label">Your name</span>
+          <input class="input input--lg" type="text" name="name" placeholder="Name" required>
+        </label>
+        <label class="field">
+          <span class="eyebrow field__label">Email</span>
+          <input class="input input--lg" type="email" name="email" placeholder="you@business.ca" required>
+        </label>
+        <label class="field">
+          <span class="eyebrow field__label">What wastes the most time</span>
+          <textarea class="input input--lg" name="message" rows="4" placeholder="e.g. re-typing invoices into QuickBooks"></textarea>
+        </label>
+        <button type="submit" class="btn btn--primary contact__submit">Request a call</button>
+        <span class="contact__note">We reply within one business day.</span>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== Closing CTA over the constellation ===== -->
   <section id="contact" class="contact" data-network>
     <canvas class="network__canvas" aria-hidden="true"></canvas>
     <div class="network__scrim" aria-hidden="true"></div>
-    <div class="contact__main">
-      <h2 class="contact__title">Tell us where the<br>week goes.</h2>
-      <p class="contact__text">Thirty minutes, no deck. Bring the task you're most tired of and we'll say honestly if automation is worth it.</p>
-      <a href="mailto:hello@dataverse.ca" class="contact__email">hello@dataverse.ca</a>
+    <div class="contact__inner">
+      <p class="cta-eyebrow"><span class="text-accent">10</span><span class="cta-eyebrow__rule"></span>Ready when you are</p>
+      <h2 class="contact__title">Tell us where the week goes.</h2>
+      <p class="contact__text">Bring the task you're most tired of and we'll say honestly if automation is worth it.</p>
+      <a href="#book" class="btn-pill">Book a call<span class="btn-pill__arrow" aria-hidden="true">↗</span></a>
+      <p class="contact__note">30 minutes. No pitch deck.</p>
     </div>
-    <!-- Webflow: replace with a native Form Block using the same classes/field names -->
-    <form class="contact__form" name="contact" data-name="Contact" data-contact-form>
-      <input class="input input--lg" type="text" name="name" placeholder="Name" required>
-      <input class="input input--lg" type="email" name="email" placeholder="Email" required>
-      <textarea class="input input--lg" name="message" rows="4" placeholder="What's eating the most time?"></textarea>
-      <button type="submit" class="btn btn--primary contact__submit">Request a call</button>
-      <span class="contact__note">We reply within one business day.</span>
-    </form>
   </section>
 
-  <!-- ===== Footer (Webflow: make this a Component) ===== -->
   <div class="footer-wordmark" aria-hidden="true">Dataverse</div>
   <footer class="site-footer">
     <span class="site-footer__brand">Dataverse</span>

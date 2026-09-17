@@ -60,7 +60,7 @@ Webflow: add the hero markup + runway div as an Embed and load `js/hero.js` with
 3. `blog/index.html`: the `.w-dyn-list > .w-dyn-items > .w-dyn-item` block is a Collection List bound to Blog Posts, sorted by published date desc. Bind each field from the sample item, delete the other two samples.
 4. `blog/post.html`: build the Collection Template page; bind each `data-cms` element to the field of the same slug. `.w-richtext` styles already cover h2/h3/h4, lists, quotes, figures, code.
 5. Time audit: paste the `#audit` section markup + `js/audit.js` into an Embed (or page custom code). Light/dark toggle: `js/theme-init.js` in head code, `js/main.js` before `</body>`.
-6. Contact form: replace with a native Form Block, same classes and field names (`name`, `email`, `message`). Currently it opens a prefilled email.
+6. Contact form (in the `#book` section): replace with a native Form Block, same classes and field names (`name`, `email`, `message`). Currently it opens a prefilled email.
 
 ### Option B — keep static hosting, pull posts from Webflow
 Use the Webflow Data API v2 (`/collections/{id}/items/live`) through a serverless function. Never put the API token in browser JS. Render the listing and post pages from that data using the same markup.
