@@ -663,13 +663,13 @@ textarea.input { resize: vertical; }
   padding: clamp(60px, 9vw, 120px) var(--gutter);
   display: flex; flex-wrap: wrap; gap: clamp(32px, 5vw, 80px); align-items: flex-start;
 }
-/* Closing orb (js/orb.js) sits behind the contact copy */
-.orb__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
-.orb__scrim {
+/* Constellation network (js/network.js) sits behind the contact copy */
+.network__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
+.network__scrim {
   position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(16, 12, 16, 0.9) 0%, rgba(16, 12, 16, 0.35) 45%, rgba(16, 12, 16, 0.55) 100%),
-    radial-gradient(70% 70% at 45% 50%, rgba(16, 12, 16, 0.1), rgba(16, 12, 16, 0.7) 80%);
+    linear-gradient(90deg, rgba(16, 12, 16, 0.82) 0%, rgba(16, 12, 16, 0.3) 42%, rgba(16, 12, 16, 0.5) 100%),
+    radial-gradient(75% 75% at 50% 50%, rgba(16, 12, 16, 0) 30%, rgba(16, 12, 16, 0.75) 100%);
 }
 .contact__main { flex: 1 1 440px; min-width: 0; }
 .contact__title {
