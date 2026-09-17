@@ -82,26 +82,37 @@ function init(hero) {
   const home = new THREE.Group();
   scene.add(home);
   const LEG = 16;
-  // rx/h = arch size, w = how wide the band is, px/py = how far this arch drifts with the
-  // cursor (mixed signs so they pull apart instead of moving as one slab).
-  const archSpecs = [
-    { rx: 2.9, h: 4.6, w: 1.55, px: 1.7, py: -0.5 },
-    { rx: 2.7, h: 5.2, w: 0.55, px: -1.0, py: 0.9 },
-    { rx: 2.5, h: 5.8, w: 1.15, px: 2.5, py: 0.3 },
-    { rx: 2.3, h: 6.3, w: 0.7, px: -1.8, py: -1.0 },
-    { rx: 2.1, h: 6.9, w: 1.35, px: 1.2, py: 1.3 },
-    { rx: 1.95, h: 7.4, w: 0.5, px: -2.3, py: 0.4 },
-    { rx: 1.8, h: 7.9, w: 0.95, px: 0.7, py: -1.5 }
-  ];
-  const arches = archSpecs.map((s, i) => {
-    const pts = archPath(s.rx, s.h, LEG, 120);
+  // A thicket of arches, generated so no two match: size, band width and how far each one
+  // drifts with the cursor (mixed signs, so they pull apart instead of moving as one slab).
+  const arand = mulberry32(21);
+  const ARCHES = 18;
+  const arches = [];
+  for (let i = 0; i < ARCHES; i++) {
+    const rx = 1.6 + arand() * 1.6;
+    const h = 4.2 + arand() * 4.2;
+    const w = 0.32 + Math.pow(arand(), 1.6) * 1.35;
+    const pts = archPath(rx, h, LEG, 110);
     const legFrac = (LEG * 0.55) / pathLength(pts);
-    const mesh = addRibbon(home, pts, 0.1, s.w, { range: [legFrac, 1 - legFrac], len: 2.4, dur: 1.4 + i * 0.15 });
-    const base = new THREE.Vector3(i * 1.75, -3.4 + i * 0.24, -i * 1.7);
+    const mesh = addRibbon(home, pts, 0.09 + arand() * 0.05, w, {
+      range: [legFrac, 1 - legFrac],
+      len: 2.2 + arand() * 1.6,
+      dur: 1.2 + arand() * 1.4
+    });
+    const base = new THREE.Vector3(
+      -2.4 + i * 1.12 + (arand() - 0.5) * 0.7,
+      -3.6 + i * 0.16 + (arand() - 0.5) * 0.8,
+      -i * 1.05 + (arand() - 0.5) * 0.8
+    );
     mesh.position.copy(base);
-    mesh.userData = { base, i, px: s.px, py: s.py };
-    return mesh;
-  });
+    mesh.userData = {
+      base,
+      i,
+      px: (arand() - 0.5) * 5.2,
+      py: (arand() - 0.5) * 3,
+      sway: 0.4 + arand() * 0.5
+    };
+    arches.push(mesh);
+  }
 
   /* ---------- Journey scene 2: slab field ---------- */
   const slabs = new THREE.Group();
@@ -214,9 +225,9 @@ function init(hero) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const narrow = hero.clientWidth < 760;
-    layout.x = narrow ? -2.2 : 3.4;
+    layout.x = narrow ? -2.6 : 2.6;
     layout.y = narrow ? -1.2 : -2.2;
-    home.scale.setScalar(narrow ? 0.95 : 1.75);
+    home.scale.setScalar(narrow ? 0.85 : 1.45);
     if (reduced) render(0, 0);
   }
   new ResizeObserver(resize).observe(hero);
@@ -312,7 +323,7 @@ function init(hero) {
       const { base, i, px, py } = m.userData;
       // Each arch drifts its own way with the cursor, on top of the group's own slow sway.
       m.position.x = base.x + follow.x * px * homeWeight;
-      m.position.y = base.y + Math.sin(t * 0.5 + i * 0.9) * 0.12 + follow.y * py * homeWeight;
+      m.position.y = base.y + Math.sin(t * m.userData.sway + i * 0.9) * 0.12 + follow.y * py * homeWeight;
       m.rotation.z = Math.sin(t * 0.3 + i) * 0.02 + follow.x * 0.03 * py * homeWeight;
     });
     rings.rotation.z = 0.35 + t * 0.08;
@@ -342,7 +353,7 @@ function init(hero) {
       const u = (t - s.start) / s.dur;
       if (u < 0) { s.mat.uniforms.uHead.value = -1; return; }
       if (u > 1) {
-        s.start = t + (journey ? 0.2 + Math.random() * 1.2 : 2 + Math.random() * 6);
+        s.start = t + (journey ? 0.3 + Math.random() * 2 : 4 + Math.random() * 12);
         s.mat.uniforms.uHead.value = -1;
         return;
       }
