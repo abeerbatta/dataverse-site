@@ -11,6 +11,8 @@ js/theme-init.js    Restores saved light/dark mode before paint (in <head>)
 js/main.js          Light/dark toggle, scroll reveals, contact form
 js/audit.js         Five-minute time audit calculator
 js/hero.js          Hero 3D scene (Three.js via jsDelivr, ES module)
+js/ribbon.js        Shared 3D helpers (ribbon geometry, streak shader)
+js/orb.js           Closing orb behind the contact section
 ```
 
 Run locally: `python3 -m http.server 8000` → http://localhost:8000
@@ -33,6 +35,9 @@ Header has a light/dark toggle (`data-mode` on `<html>`, remembered in localStor
 - Tuning in `js/hero.js`: word windows `windows`, word positions `spots`, camera path `keys`, scroll smoothing `dt * 5`.
 Falls back to the CSS gradient (and no runway) if WebGL is unavailable or for reduced-motion users.
 Webflow: add the hero markup + runway div as an Embed and load `js/hero.js` with `<script type="module">` in page custom code.
+
+## Closing orb
+`js/orb.js` draws a glass sphere holding tilted ribbon slabs behind the contact section, with a light arc on its rim. It turns as the section scrolls through view and drifts with the cursor. Only renders while that section is on screen; skipped entirely without WebGL or for reduced-motion visitors.
 
 ## Webflow CMS (blog)
 
