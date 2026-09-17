@@ -215,6 +215,7 @@ img { max-width: 100%; display: block; }
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  min-height: calc(100svh - 71px);
   padding: 0 var(--gutter);
   display: flex;
   flex-direction: column;
@@ -230,7 +231,7 @@ img { max-width: 100%; display: block; }
   position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: 0; display: block;
 }
-/* While holding, the 3D stage takes over the whole viewport */
+/* During the fly-through the 3D stage takes over the whole viewport */
 .hero3d__backdrop {
   position: fixed; inset: 0; z-index: -1; background: #100C10;
   opacity: 0; pointer-events: none; transition: opacity 400ms ease;
@@ -259,42 +260,7 @@ img { max-width: 100%; display: block; }
   100% { transform: translate(0, 0); }
 }
 
-/* Cursor ring (follows the cursor on hover devices; fixed button on touch) */
-.cursor-ring {
-  position: fixed; left: 0; top: 0; z-index: 3;
-  width: 116px; height: 116px; margin: -58px 0 0 -58px;
-  padding: 0; border: 0; background: none; color: var(--ink);
-  pointer-events: none; opacity: 0; transition: opacity 300ms ease;
-  will-change: transform; cursor: pointer;
-  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none;
-}
-.cursor-ring.is-visible { opacity: 1; }
-.cursor-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-.cursor-ring__track { fill: none; stroke: rgba(240, 234, 238, 0.35); stroke-width: 0.8; }
-.cursor-ring__progress {
-  fill: none; stroke: var(--accent); stroke-width: 1.8;
-  stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p, 0));
-  filter: drop-shadow(0 0 6px rgba(255, 92, 56, 0.8));
-}
-.cursor-ring__dot {
-  position: absolute; top: 50%; width: 4px; height: 4px; margin-top: -2px;
-  border-radius: 50%; background: var(--ink); transition: transform 300ms ease, background 300ms ease;
-}
-.cursor-ring__dot--l { left: 13%; }
-.cursor-ring__dot--r { right: 13%; }
-.hero3d.is-holding .cursor-ring__dot { transform: scale(1.8); background: var(--accent); }
-.cursor-ring__label {
-  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-  white-space: nowrap; transition: opacity 300ms ease;
-}
-.hero3d.is-journey .cursor-ring__label { opacity: 0; }
-.cursor-ring:focus-visible { outline: none; opacity: 1; }
-.cursor-ring:focus-visible .cursor-ring__track { stroke: var(--accent); }
-.hero3d.is-static .cursor-ring { display: none; }
-.hero3d.is-holding { -webkit-user-select: none; user-select: none; }
-
-/* Tagline words revealed during the hold */
+/* Tagline words revealed during the fly-through */
 .tagline { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
 .tagline__word {
   position: absolute; left: var(--x, 50%); top: var(--y, 50%);
@@ -316,7 +282,7 @@ img { max-width: 100%; display: block; }
 }
 .tagline__char.is-accent { color: var(--accent); }
 
-/* Hold mode: hand the hero over to the 3D scene */
+/* Fly-through: hand the page over to the 3D scene */
 .hero3d__content, .hero3d__foot, .hero3d__scrim { transition: opacity 600ms ease; }
 .hero3d.is-journey .hero3d__content,
 .hero3d.is-journey .hero3d__foot { opacity: 0; pointer-events: none; }
@@ -324,12 +290,11 @@ img { max-width: 100%; display: block; }
 .hero3d.is-journey .hero3d__scrim { opacity: 0.25; }
 body.is-journey .site-header { opacity: 0; pointer-events: none; }
 
-@media (hover: none) {
-  .cursor-ring {
-    position: absolute; left: 50%; top: 28px; width: 92px; height: 92px; margin: 0 0 0 -46px;
-    pointer-events: auto; opacity: 1; transform: none !important;
-  }
-  .hero3d__content { padding-top: 168px; }
+/* Scroll runway: the fixed 3D stage plays while this scrolls past */
+.hero-journey { display: none; height: 520vh; }
+.hero-journey.is-ready { display: block; }
+@media (max-width: 760px) {
+  .hero-journey { height: 420vh; }
 }
 
 /* Content */
@@ -386,6 +351,7 @@ body.is-journey .site-header { opacity: 0; pointer-events: none; }
 /* Footer strip + marquee */
 .hero3d__foot {
   position: relative; z-index: 2;
+  margin-top: auto;
   border-top: 1px solid var(--line);
   display: flex; align-items: center; gap: 28px;
   padding: 22px 0 26px;
@@ -421,7 +387,7 @@ body.is-journey .site-header { opacity: 0; pointer-events: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero3d__grain, .marquee__track { animation: none; }
-  .cursor-ring, .tagline { display: none; }
+  .tagline { display: none; }
 }
 
 .hero__meta {

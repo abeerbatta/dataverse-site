@@ -25,12 +25,13 @@ Header has a light/dark toggle (`data-mode` on `<html>`, remembered in localStor
 
 ## Hero
 3D scene in `js/hero.js` (Three.js).
-- Idle: ribbon arches follow the cursor; light streaks run along them now and then.
-- Click and hold (anywhere on the hero; the ring on touch; Space/Enter on the ring): the page fades, the stage goes full-screen and the camera flies through the arches, a slab field and a ring stack while three tagline phrases assemble letter by letter. Letting go rewinds.
+- Top of page: ribbon arches follow the cursor; light streaks run along them now and then.
+- Scrolling down plays the fly-through on a full-screen stage: the camera passes through the arches, a slab field and a ring stack while three tagline phrases assemble letter by letter. Scrolling up rewinds. When it ends the stage fades out and the rest of the page scrolls in.
+- Length of the fly-through = height of the runway `.hero-journey` in `css/styles.css` (520vh desktop, 420vh mobile).
 - Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html` (last word of each phrase is highlighted).
-- Timing: hold duration `dt / 11`, rewind `dt / 1.8`, word windows `windows`, word positions `spots`, camera path `keys`.
-Falls back to the CSS gradient if WebGL is unavailable; renders one still frame (no hold) for reduced-motion users.
-Webflow: add the hero markup as an Embed and load `js/hero.js` with `<script type="module">` in page custom code.
+- Tuning in `js/hero.js`: word windows `windows`, word positions `spots`, camera path `keys`, scroll smoothing `dt * 5`.
+Falls back to the CSS gradient (and no runway) if WebGL is unavailable or for reduced-motion users.
+Webflow: add the hero markup + runway div as an Embed and load `js/hero.js` with `<script type="module">` in page custom code.
 
 ## Webflow CMS (blog)
 

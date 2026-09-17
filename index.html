@@ -33,6 +33,7 @@
 
   <!-- ===== Hero (3D scene: js/hero.js — Webflow: canvas + script go in an Embed) ===== -->
   <section id="top" class="hero3d" data-hero3d data-taglines="Find the hours|Automate the rest|Get your week back">
+    <!-- Scrolling past the hero plays the 3D fly-through; edit the phrases in data-taglines -->
     <div class="hero3d__backdrop" aria-hidden="true"></div>
     <div class="hero3d__stage">
       <canvas class="hero3d__canvas" aria-hidden="true"></canvas>
@@ -41,16 +42,6 @@
       <div class="tagline" data-tagline aria-live="polite"></div>
     </div>
 
-    <!-- Click-and-hold: ring follows the cursor; holding plays the fly-through + taglines (edit words in data-taglines above) -->
-    <button type="button" class="cursor-ring" data-cursor aria-label="Hold to play the Dataverse story">
-      <svg viewBox="0 0 120 120" aria-hidden="true">
-        <circle class="cursor-ring__track" cx="60" cy="60" r="58"></circle>
-        <circle class="cursor-ring__progress" cx="60" cy="60" r="58" pathLength="1"></circle>
-      </svg>
-      <span class="cursor-ring__dot cursor-ring__dot--l"></span>
-      <span class="cursor-ring__dot cursor-ring__dot--r"></span>
-      <span class="cursor-ring__label" data-cursor-label>Click and hold</span>
-    </button>
 
     <div class="hero3d__content">
       <div class="hero3d__main">
@@ -80,6 +71,8 @@
       </div>
     </div>
   </section>
+  <!-- Scroll runway for the hero fly-through (enabled by js/hero.js) -->
+  <div class="hero-journey" data-hero-journey aria-hidden="true"></div>
 
   <!-- ===== Services ===== -->
   <section id="services" class="section">

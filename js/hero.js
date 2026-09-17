@@ -1,9 +1,10 @@
 /* Dataverse — hero 3D scene (Three.js).
    Idle: ribbon arches drift and follow the cursor; light streaks run along the ribbons.
-   Hold (mouse anywhere on the hero, the ring on touch, or Space/Enter on the ring):
-   the page chrome fades, the camera flies through the arches, a field of slabs and a
-   stack of rings while tagline words assemble letter by letter. Release rewinds home.
-   Falls back to the CSS gradient background if WebGL is unavailable. */
+   Scrolling down from the hero plays a fly-through on a full-screen stage: the camera
+   passes through the arches, a field of slabs and a stack of rings while tagline words
+   assemble letter by letter. The scroll runway ([data-hero-journey]) sets its length;
+   at the end the stage fades out and the rest of the page scrolls in. Scrolling up rewinds.
+   Falls back to the CSS gradient background (and no runway) if WebGL is unavailable. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js';
 
 const hero = document.querySelector('[data-hero3d]');
@@ -11,11 +12,11 @@ if (hero) init(hero);
 
 function init(hero) {
   const canvas = hero.querySelector('.hero3d__canvas');
-  const ring = hero.querySelector('[data-cursor]');
-  const ringLabel = hero.querySelector('[data-cursor-label]');
+  const runway = document.querySelector('[data-hero-journey]');
+  const stage = hero.querySelector('.hero3d__stage');
+  const backdrop = hero.querySelector('.hero3d__backdrop');
   const taglineEl = hero.querySelector('[data-tagline]');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const canHover = window.matchMedia('(hover: hover)').matches;
 
   let renderer;
   try {
@@ -215,62 +216,48 @@ function init(hero) {
   new ResizeObserver(resize).observe(hero);
 
   /* ---------- Input ---------- */
-  let holding = false;
-  let progress = 0; // 0 = home view, 1 = end of the fly-through
-  const pointer = { x: 0, y: 0, inside: false, overUI: false };
+  let progress = 0; // smoothed fly-through progress, 0 = home view
+  const pointer = { x: 0, y: 0 };
   const follow = { x: 0, y: 0 };
-  const ringPos = { x: 0, y: 0 };
-  const ringTarget = { x: 0, y: 0 };
-  const interactive = 'a, input, textarea, select, button:not([data-cursor])';
 
-  // Listen on window: while holding, the stage covers the viewport, not just the hero.
   window.addEventListener('pointermove', (e) => {
-    const r = hero.getBoundingClientRect();
+    if (e.pointerType === 'touch') return;
     const journey = hero.classList.contains('is-journey');
-    const inHero = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-    const box = journey ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } : r;
-    pointer.inside = e.pointerType !== 'touch' && (inHero || journey);
-    pointer.x = pointer.inside ? ((e.clientX - box.left) / box.width) * 2 - 1 : 0;
-    pointer.y = pointer.inside ? ((e.clientY - box.top) / box.height) * 2 - 1 : 0;
-    if (ring.classList.contains('is-visible') === false) { ringPos.x = e.clientX; ringPos.y = e.clientY; }
-    ringTarget.x = e.clientX;
-    ringTarget.y = e.clientY;
-    pointer.overUI = hero.contains(e.target) && !!e.target.closest(interactive);
+    const r = journey ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } : hero.getBoundingClientRect();
+    const inside = journey || (e.clientX >= r.left && e.clientX <= r.left + r.width && e.clientY >= r.top && e.clientY <= r.top + r.height);
+    pointer.x = inside ? ((e.clientX - r.left) / r.width) * 2 - 1 : 0;
+    pointer.y = inside ? ((e.clientY - r.top) / r.height) * 2 - 1 : 0;
   });
   document.addEventListener('pointerleave', () => {
-    pointer.inside = false;
     pointer.x = 0;
     pointer.y = 0;
   });
-  hero.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || e.target.closest(interactive)) return;
-    // On touch, only the ring starts it so the hero can still be scrolled.
-    if (e.pointerType === 'touch' && !e.target.closest('[data-cursor]')) return;
-    if (e.pointerType === 'touch') e.preventDefault();
-    holding = true;
-  });
-  const release = () => { holding = false; };
-  window.addEventListener('pointerup', release);
-  window.addEventListener('pointercancel', release);
-  window.addEventListener('blur', release);
-  ring.addEventListener('contextmenu', (e) => e.preventDefault());
-  ring.addEventListener('keydown', (e) => {
-    if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); holding = true; }
-  });
-  ring.addEventListener('keyup', (e) => {
-    if (e.key === ' ' || e.key === 'Enter') holding = false;
-  });
+
+  /* Scroll position relative to the runway.
+     path: 0 at the top of the page → 1 when the runway's last screen is reached.
+     exit: 0 → 1 over the next ~60% of a screen, as the following section scrolls in. */
+  function scrollState() {
+    if (!runway) return { path: 0, exit: 1 };
+    const end = runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+    const y = window.scrollY;
+    return {
+      path: end > 0 ? Math.min(1, Math.max(0, y / end)) : 0,
+      exit: smoothstep(0, window.innerHeight * 0.6, y - end)
+    };
+  }
 
   /* ---------- Render ---------- */
   const tmpPos = new THREE.Vector3();
   const tmpLook = new THREE.Vector3();
-  let labelState = '';
 
   function render(t, dt) {
-    progress = holding ? Math.min(1, progress + dt / 11) : Math.max(0, progress - dt / 1.8);
-    const p = easeInOut(progress);
-    const journey = progress > 0.004;
-    const homeWeight = 1 - smoothstep(0, 0.12, progress);
+    const { path: raw, exit } = scrollState();
+    progress += (raw - progress) * Math.min(1, dt * 5);
+    if (Math.abs(raw - progress) < 0.0005) progress = raw;
+    const pathT = progress;
+    const p = easeInOut(pathT);
+    const journey = window.scrollY > 1 && exit < 1;
+    const homeWeight = 1 - smoothstep(0, 0.12, pathT);
     const away = 1 - homeWeight;
 
     // Cursor follow: strong at home, a subtle look-around during the journey
@@ -331,24 +318,16 @@ function init(hero) {
     // Taglines
     words.forEach((w, i) => {
       const [a, b] = windows[i];
-      if (holding && progress >= a && progress < b) setWord(w, 'in');
+      if (journey && exit < 0.05 && pathT >= a && pathT < b) setWord(w, 'in');
       else if (w.state === 'in') setWord(w, 'out');
     });
 
-    // Page chrome + cursor ring
+    // Page chrome
     hero.classList.toggle('is-journey', journey);
-    hero.classList.toggle('is-holding', holding);
-    document.body.classList.toggle('is-journey', journey);
-    ring.style.setProperty('--p', progress.toFixed(3));
-    if (canHover) {
-      const rk = Math.min(1, dt * 10);
-      ringPos.x += (ringTarget.x - ringPos.x) * rk;
-      ringPos.y += (ringTarget.y - ringPos.y) * rk;
-      ring.style.transform = 'translate(' + ringPos.x.toFixed(1) + 'px,' + ringPos.y.toFixed(1) + 'px)';
-      ring.classList.toggle('is-visible', (pointer.inside && !pointer.overUI) || holding);
-    }
-    const next = progress >= 1 ? 'Let go' : 'Click and hold';
-    if (next !== labelState) { ringLabel.textContent = next; labelState = next; }
+    document.body.classList.toggle('is-journey', journey && exit < 0.5);
+    const fade = journey ? String(1 - exit) : '';
+    stage.style.opacity = fade;
+    backdrop.style.opacity = fade;
   }
 
   if (reduced) {
@@ -358,6 +337,10 @@ function init(hero) {
     return;
   }
 
+  if (runway) runway.classList.add('is-ready');
+
+  // Keep rendering while the hero or its scroll runway is on screen.
+  const onScreen = new Set();
   let running = true;
   let last = performance.now();
   let t = 0;
@@ -369,15 +352,18 @@ function init(hero) {
     render(t, dt);
     requestAnimationFrame(frame);
   }
-  new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && !running) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => (en.isIntersecting ? onScreen.add(en.target) : onScreen.delete(en.target)));
+    if (onScreen.size > 0 && !running) {
       running = true;
       last = performance.now();
       requestAnimationFrame(frame);
-    } else if (!entry.isIntersecting && !holding) {
+    } else if (onScreen.size === 0) {
       running = false;
     }
-  }).observe(hero);
+  });
+  io.observe(hero);
+  if (runway) io.observe(runway);
 
   resize();
   requestAnimationFrame(frame);
