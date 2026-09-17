@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-CA" data-mode="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Field notes — Dataverse</title>
+  <meta name="description" content="Practical writing on automation and AI adoption for small Canadian teams.">
+  <script src="../js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Familjen+Grotesk:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== Header (Webflow: make this a Component) ===== -->
+  <header class="site-header">
+    <a href="../index.html" class="logo">Dataverse<span class="logo__dot"></span></a>
+    <nav class="nav">
+      <a href="../index.html#services">Services</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#audit" class="nav__link--accent">Time audit</a>
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="index.html" class="text-accent" aria-current="page">Blog</a>
+    </nav>
+    <div class="header-tools">
+      <button type="button" class="mode-toggle" data-toggle-mode>Light</button>
+      <a href="../index.html#contact" class="btn btn--primary btn--sm">Book a call</a>
+    </div>
+  </header>
+
+  <!-- ===== Blog hero ===== -->
+  <section class="blog-hero">
+    <div class="blog-hero__main">
+      <span class="audit-head__badge">● Field notes</span>
+      <h1 class="blog-hero__title">Notes from<br>inside the week.</h1>
+    </div>
+    <p class="blog-hero__text">What we learn sitting with small teams — the handoffs that eat hours, and the builds that pay them back.</p>
+  </section>
+
+  <!-- ===== Post list =====
+       Webflow: this block maps to a Collection List bound to "Blog Posts".
+       .w-dyn-list = Collection List Wrapper, .w-dyn-items = Collection List, .w-dyn-item = Collection Item.
+       Sample items below are placeholders; Webflow repeats one item per CMS entry. -->
+  <section class="section">
+    <div class="w-dyn-list">
+      <div role="list" class="w-dyn-items post-list">
+        <div role="listitem" class="w-dyn-item">
+          <a href="post.html" class="post-row">
+            <div class="placeholder post-row__thumb"><span class="placeholder__label">cover image</span></div>
+            <div class="post-row__body">
+              <div class="post-row__meta"><span class="text-accent">Field guide</span><span>Sep 10, 2026</span><span>6 min read</span></div>
+              <h3 class="post-row__title">The three automations every trades business should build first</h3>
+              <p class="post-row__excerpt">Quotes, invoices, and the data you type twice — in the order we'd tackle them.</p>
+            </div>
+            <span class="post-row__arrow">→</span>
+          </a>
+        </div>
+        <div role="listitem" class="w-dyn-item">
+          <a href="post.html" class="post-row">
+            <div class="placeholder post-row__thumb"><span class="placeholder__label">cover image</span></div>
+            <div class="post-row__body">
+              <div class="post-row__meta"><span class="text-accent">Case notes</span><span>Aug 28, 2026</span><span>4 min read</span></div>
+              <h3 class="post-row__title">What a two-week readiness audit actually looks like</h3>
+              <p class="post-row__excerpt">Who we sit with, what we measure, and the plan you walk away with.</p>
+            </div>
+            <span class="post-row__arrow">→</span>
+          </a>
+        </div>
+        <div role="listitem" class="w-dyn-item">
+          <a href="post.html" class="post-row">
+            <div class="placeholder post-row__thumb"><span class="placeholder__label">cover image</span></div>
+            <div class="post-row__body">
+              <div class="post-row__meta"><span class="text-accent">Opinion</span><span>Aug 12, 2026</span><span>5 min read</span></div>
+              <h3 class="post-row__title">You don't need an AI platform. You need fewer handoffs.</h3>
+              <p class="post-row__excerpt">Most small teams get more from connecting the tools they already pay for.</p>
+            </div>
+            <span class="post-row__arrow">→</span>
+          </a>
+        </div>
+      </div>
+      <!-- Webflow "Empty State" -->
+      <div class="w-dyn-empty empty-state" hidden>No posts yet.</div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-band">
+    <h2 class="cta-band__title">Rather talk it through?</h2>
+    <a href="../index.html#contact" class="btn btn--primary btn--lg">Book a 30-minute call</a>
+  </section>
+
+  <!-- ===== Footer (Webflow: make this a Component) ===== -->
+  <footer class="site-footer">
+    <span class="site-footer__brand">Dataverse</span>
+    <span>Automation &amp; AI adoption</span>
+    <span>Canadian owned &amp; operated</span>
+    <span class="site-footer__end">© 2026</span>
+  </footer>
+</div>
+
+<script src="../js/main.js"></script>
+</body>
+</html>
