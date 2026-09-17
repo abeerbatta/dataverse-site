@@ -12,12 +12,12 @@
   ];
 
   var TASKS = [
-    { key: 'quote', label: 'Quoting & estimates', hours: 5, on: true, auto: 0.6, build: 'A quote builder that prices from a phone form and follows up on its own' },
-    { key: 'intake', label: 'Client intake & paperwork', hours: 4, on: true, auto: 0.75, build: 'Intake forms that parse themselves into your system before day one' },
-    { key: 'sched', label: 'Scheduling & reminders', hours: 3, on: false, auto: 0.8, build: 'Booking and reminder flows that cut no-shows without a phone call' },
+    { key: 'quote', label: 'Quoting & estimates', hours: 5, on: true, auto: 0.6, build: 'A quote builder that prices from a phone form and follows up' },
+    { key: 'intake', label: 'Client intake & paperwork', hours: 4, on: true, auto: 0.75, build: 'Intake forms that file themselves before day one' },
+    { key: 'sched', label: 'Scheduling & reminders', hours: 3, on: false, auto: 0.8, build: 'Booking and reminder flows that cut no-shows' },
     { key: 'invoice', label: 'Invoicing & chasing payment', hours: 3, on: true, auto: 0.7, build: 'Invoices raised on job completion, with a polite escalation ladder' },
-    { key: 'retype', label: 'Re-typing data between systems', hours: 4, on: true, auto: 0.85, build: 'A single sync so nothing gets typed twice — the fastest payback you own' },
-    { key: 'enquiry', label: 'Answering the same enquiries', hours: 5, on: false, auto: 0.6, build: 'An after-hours agent that answers the top 20 questions in your voice' }
+    { key: 'retype', label: 'Re-typing data between systems', hours: 4, on: true, auto: 0.85, build: 'A single sync so nothing gets typed twice' },
+    { key: 'enquiry', label: 'Answering the same enquiries', hours: 5, on: false, auto: 0.6, build: 'An after-hours agent that answers your top 20 questions' }
   ];
 
   var state = {
@@ -108,7 +108,7 @@
 
     var builds = a.picked.length
       ? a.picked.map(function (p, i) { return { n: '0' + (i + 1), text: p.build }; })
-      : [{ n: '00', text: 'Tick a task above and we will tell you what to build first.' }];
+      : [{ n: '00', text: 'Tick a task above to see what we'd build first.' }];
     var ul = $('[data-audit-builds]');
     ul.innerHTML = '';
     builds.forEach(function (b) {
