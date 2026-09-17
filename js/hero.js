@@ -3,7 +3,8 @@
    Scrolling down from the hero plays a fly-through on a full-screen stage: the camera
    passes through the arches, a field of slabs and a stack of rings while tagline words
    assemble letter by letter. The scroll runway ([data-hero-journey]) sets its length;
-   at the end the stage fades out and the rest of the page scrolls in. Scrolling up rewinds.
+   at the end the stage fades out, the runway collapses so the fly-through plays only once
+   per visit, and the rest of the page scrolls in. Scrolling up before the end rewinds.
    Falls back to the CSS gradient background (and no runway) if WebGL is unavailable. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js';
 
@@ -236,14 +237,44 @@ function init(hero) {
   /* Scroll position relative to the runway.
      path: 0 at the top of the page → 1 when the runway's last screen is reached.
      exit: 0 → 1 over the next ~60% of a screen, as the following section scrolls in. */
+  let played = false;
+  function runwayEnd() {
+    return runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+  }
   function scrollState() {
-    if (!runway) return { path: 0, exit: 1 };
-    const end = runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+    if (!runway || played) return { path: 0, exit: 1 };
+    const end = runwayEnd();
     const y = window.scrollY;
     return {
       path: end > 0 ? Math.min(1, Math.max(0, y / end)) : 0,
       exit: smoothstep(0, window.innerHeight * 0.6, y - end)
     };
+  }
+
+  // Third safety net: a jump (anchor link, End key) can skip the observer's threshold crossing.
+  window.addEventListener('scroll', () => {
+    if (!played && runway && window.scrollY - runwayEnd() >= window.innerHeight) finish();
+  }, { passive: true });
+
+  /* Once the runway has scrolled fully out of sight above the viewport, drop it so
+     scrolling back up shows the plain hero instead of replaying the fly-through.
+     The page is scrolled by the runway's own height, so nothing moves under the reader. */
+  function finish() {
+    played = true;
+    // Hold the next section still: note where it sits, collapse the runway, put it back.
+    const anchor = runway.nextElementSibling || document.body;
+    const before = anchor.getBoundingClientRect().top;
+    runway.classList.remove('is-ready');
+    progress = 0;
+    hero.classList.remove('is-journey');
+    document.body.classList.remove('is-journey');
+    stage.style.opacity = '';
+    backdrop.style.opacity = '';
+    const shift = anchor.getBoundingClientRect().top - before;
+    const target = Math.max(0, window.scrollY + shift);
+    window.scrollTo(0, target);
+    // Re-apply after layout settles: scroll anchoring can otherwise move the page.
+    requestAnimationFrame(() => window.scrollTo(0, target));
   }
 
   /* ---------- Render ---------- */
@@ -252,6 +283,7 @@ function init(hero) {
 
   function render(t, dt) {
     const { path: raw, exit } = scrollState();
+    if (!played && runway && window.scrollY - runwayEnd() >= window.innerHeight) finish();
     progress += (raw - progress) * Math.min(1, dt * 5);
     if (Math.abs(raw - progress) < 0.0005) progress = raw;
     const pathT = progress;
@@ -361,6 +393,10 @@ function init(hero) {
     } else if (onScreen.size === 0) {
       running = false;
     }
+    // Scrolled clear of the runway: the fly-through is over.
+    entries.forEach((en) => {
+      if (en.target === runway && !en.isIntersecting && !played && window.scrollY > runwayEnd()) finish();
+    });
   });
   io.observe(hero);
   if (runway) io.observe(runway);
