@@ -661,19 +661,35 @@ textarea.input { resize: vertical; }
 .book__cols {
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(28px, 5vw, 80px);
+  gap: clamp(28px, 5vw, 72px);
   align-items: flex-start;
 }
-.book__about { flex: 1 1 360px; min-width: 0; }
+.book__about { flex: 1 1 380px; min-width: 0; }
+.book__head {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(32px, 3.6vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin: 14px 0 18px;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.book__lede { margin: 0 0 30px; color: var(--muted); max-width: 46ch; }
 .book__list {
   list-style: none;
-  margin: 18px 0 30px;
+  margin: 0 0 30px;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 22px;
 }
-.book__list li { display: flex; gap: 16px; align-items: flex-start; }
+.book__list li {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
 .book__n { font-family: var(--f-mono); font-size: 11.5px; color: var(--accent); padding-top: 4px; }
 .book__title { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
 .book__text { margin: 0; color: var(--muted); font-size: 15px; max-width: 46ch; }
@@ -683,24 +699,144 @@ textarea.input { resize: vertical; }
   border-bottom: 1px solid var(--accent);
   padding-bottom: 3px;
 }
-.book__form {
-  flex: 1 1 380px;
+
+/* The call request panel */
+.bform {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: 1 1 460px;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 3px;
   padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 6px;
   background: var(--surface);
 }
-.book__form .field { flex: 1 1 auto; }
-.contact__submit { font-size: 15px; padding: 15px 20px; margin-top: 4px; }
-.contact__note {
-  font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--muted);
+/* A soft light that follows the cursor across the panel */
+.bform__glow {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  background: radial-gradient(240px 240px at var(--mx, 50%) var(--my, 50%), rgba(255, 92, 56, 0.16), transparent 70%);
 }
-.form-status { font-family: var(--f-mono); font-size: 11.5px; color: var(--accent); }
+.bform.is-lit .bform__glow { opacity: 1; }
+.bform__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.bform__count { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+.bform.is-complete .bform__count { color: var(--accent); }
+.bform__dots { display: flex; align-items: center; gap: 6px; margin: 18px 0 26px; }
+.bform__dot {
+  flex: 1 1 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 300ms ease;
+}
+.bform__dot.is-on { background: var(--accent); }
+
+.bform__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 24px; }
+.bf { position: relative; display: block; min-width: 0; }
+.bf--wide { grid-column: 1 / -1; }
+.bf__input {
+  width: 100%;
+  font-family: var(--f-body);
+  font-size: 15.5px;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 22px 26px 9px 0;
+  transition: border-color 250ms ease;
+  appearance: none;
+}
+.bf__input:focus { outline: none; border-bottom-color: var(--accent); }
+.bf__area { resize: vertical; min-height: 78px; }
+.bf__select { cursor: pointer; }
+.bf__select option { background: var(--surface); color: var(--ink); }
+.bf__label {
+  position: absolute;
+  left: 0;
+  top: 22px;
+  font-size: 15.5px;
+  color: var(--muted);
+  pointer-events: none;
+  transition: transform 220ms ease, font-size 220ms ease, color 220ms ease;
+  transform-origin: left top;
+}
+/* Float the label once the field has content or focus */
+.bf__input:focus ~ .bf__label,
+.bf__input:not(.bf__select):not(:placeholder-shown) ~ .bf__label,
+.bf.is-filled .bf__label {
+  transform: translateY(-20px);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: var(--f-mono);
+  color: var(--muted);
+}
+.bf__input:focus ~ .bf__label { color: var(--accent); }
+.bf__dot {
+  position: absolute;
+  right: 2px;
+  bottom: 14px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+.bf.is-filled .bf__dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(255, 92, 56, 0.6);
+}
+.bf__chev {
+  position: absolute; right: 20px; bottom: 12px;
+  color: var(--muted); pointer-events: none; font-size: 14px;
+}
+.bf__legend {
+  display: block;
+  font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+}
+.seg {
+  display: flex;
+  flex-wrap: nowrap;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 4px;
+  gap: 2px;
+}
+.seg__btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 13.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+}
+.seg__btn:hover { color: var(--ink); }
+.seg__btn.is-on { background: var(--accent); color: var(--accent-ink); }
+
+.bform__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 22px;
+  margin-top: 30px;
+}
+.bform__note { margin: 0; flex: 1 1 200px; font-size: 13.5px; color: var(--muted); }
+.bform.is-invalid .bf:not(.is-filled) .bf__dot { border-color: var(--accent); }
 
 /* ---------- Closing CTA (over the constellation, always dark) ---------- */
 /* Constellation network (js/network.js) fills the section behind the copy */
@@ -993,8 +1129,12 @@ textarea.input { resize: vertical; }
   .plan__text, .plan__list { font-size: 15px; }
 
   /* Book + closing CTA */
-  .book__cols { gap: 28px; }
-  .book__form { padding: 22px; }
+  .book__cols { gap: 30px; }
+  .bform { padding: 20px; }
+  .bform__grid { grid-template-columns: 1fr; gap: 18px; }
+  .book__head { font-size: 28px; }
+  .book__lede { font-size: 15px; }
+  .seg__btn { font-size: 13px; padding: 8px 11px; }
   .contact { padding: 72px var(--gutter); }
   .contact__title { font-size: 36px; }
   .contact__text { font-size: 15px; }

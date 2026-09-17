@@ -234,28 +234,26 @@
     </div>
   </section>
 
-  <!-- ===== Book a call (the form lives here now) ===== -->
+  <!-- ===== Book a call ===== -->
   <section id="book" class="section book">
-    <div class="section-head">
-      <h2 class="h2 section-head__title">Book a call</h2>
-      <p class="section-head__text">Thirty minutes with the person who builds these. Bring the task you're most tired of.</p>
-    </div>
     <div class="book__cols">
       <div class="book__about">
-        <div class="eyebrow">What happens on it</div>
+        <div class="eyebrow">Book a call</div>
+        <h2 class="book__head">Find out what your business can stop doing.</h2>
+        <p class="book__lede">One call. We look at how work moves through your business and show you what can come off your plate.</p>
         <ol class="book__list">
           <li>
             <span class="book__n">01</span>
             <div>
-              <h3 class="book__title">We ask how the week runs</h3>
-              <p class="book__text">Quotes, intake, scheduling, invoices — how each one moves through your business today.</p>
+              <h3 class="book__title">30 minutes, with the person who builds these</h3>
+              <p class="book__text">No sales deck. We ask how quotes, intake, scheduling and invoices move through your business today.</p>
             </div>
           </li>
           <li>
             <span class="book__n">02</span>
             <div>
-              <h3 class="book__title">We map where the hours go</h3>
-              <p class="book__text">Which handoffs repeat, which jobs slip, and what each one costs you.</p>
+              <h3 class="book__title">We map your week</h3>
+              <p class="book__text">Where the hours go, which jobs slip through the cracks, and what each one costs you.</p>
             </div>
           </li>
           <li>
@@ -269,22 +267,85 @@
         <a href="mailto:hello@dataverse.ca" class="book__email">hello@dataverse.ca</a>
       </div>
 
-      <!-- Webflow: replace with a native Form Block using the same classes/field names -->
-      <form class="book__form" name="contact" data-name="Contact" data-contact-form>
-        <label class="field">
-          <span class="eyebrow field__label">Your name</span>
-          <input class="input input--lg" type="text" name="name" placeholder="Name" required>
-        </label>
-        <label class="field">
-          <span class="eyebrow field__label">Email</span>
-          <input class="input input--lg" type="email" name="email" placeholder="you@business.ca" required>
-        </label>
-        <label class="field">
-          <span class="eyebrow field__label">What wastes the most time</span>
-          <textarea class="input input--lg" name="message" rows="4" placeholder="e.g. re-typing invoices into QuickBooks"></textarea>
-        </label>
-        <button type="submit" class="btn btn--primary contact__submit">Request a call</button>
-        <span class="contact__note">We reply within one business day.</span>
+      <!-- Webflow: rebuild as a native Form Block; keep the field names below -->
+      <form class="bform" name="call-request" data-name="Call request" data-book-form novalidate>
+        <div class="bform__glow" aria-hidden="true"></div>
+        <header class="bform__head">
+          <span class="eyebrow">Call request</span>
+          <span class="bform__count" data-book-count>0 / 8</span>
+        </header>
+        <div class="bform__dots" data-book-dots aria-hidden="true"></div>
+
+        <div class="bform__grid">
+          <label class="bf">
+            <input class="bf__input" type="text" name="name" placeholder=" " autocomplete="name" data-book-field>
+            <span class="bf__label">Your name</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="text" name="business" placeholder=" " autocomplete="organization" data-book-field>
+            <span class="bf__label">Business name</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="email" name="email" placeholder=" " autocomplete="email" data-book-field>
+            <span class="bf__label">Email</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="tel" name="phone" placeholder=" " autocomplete="tel" data-book-field>
+            <span class="bf__label">Phone</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+
+          <label class="bf">
+            <select class="bf__input bf__select" name="industry" data-book-field>
+              <option value="" selected></option>
+              <option>Trades &amp; home services</option>
+              <option>Law / accounting</option>
+              <option>Clinic</option>
+              <option>Brokerage</option>
+              <option>Restaurant</option>
+              <option>Something else</option>
+            </select>
+            <span class="bf__label">Your line of work</span>
+            <span class="bf__chev" aria-hidden="true">⌄</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+
+          <div class="bf bf--seg">
+            <span class="bf__legend">Preferred call time</span>
+            <div class="seg" role="radiogroup" aria-label="Preferred call time" data-book-seg="callTime">
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Morning</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Afternoon</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Evening</button>
+            </div>
+            <input type="hidden" name="callTime" data-book-field>
+          </div>
+
+          <div class="bf bf--seg bf--wide">
+            <span class="bf__legend">Team size, including you</span>
+            <div class="seg" role="radiogroup" aria-label="Team size" data-book-seg="size">
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Just me</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">2 to 5</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">6 to 15</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">16 to 50</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">50+</button>
+            </div>
+            <input type="hidden" name="size" data-book-field>
+          </div>
+
+          <label class="bf bf--wide">
+            <textarea class="bf__input bf__area" name="message" rows="3" placeholder=" " data-book-field></textarea>
+            <span class="bf__label">What wastes the most of your time?</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="bform__foot">
+          <button type="submit" class="btn-pill">Request my call<span class="btn-pill__arrow" aria-hidden="true">↗</span></button>
+          <p class="bform__note">No spam, no list. We only use this to set up your call.</p>
+        </div>
       </form>
     </div>
   </section>
@@ -294,7 +355,7 @@
     <canvas class="network__canvas" aria-hidden="true"></canvas>
     <div class="network__scrim" aria-hidden="true"></div>
     <div class="contact__inner">
-      <p class="cta-eyebrow"><span class="text-accent">10</span><span class="cta-eyebrow__rule"></span>Ready when you are</p>
+      <p class="cta-eyebrow"><span class="cta-eyebrow__rule"></span>Ready when you are</p>
       <h2 class="contact__title">Tell us where the week goes.</h2>
       <p class="contact__text">Bring the task you're most tired of and we'll say honestly if automation is worth it.</p>
       <a href="#book" class="btn-pill">Book a call<span class="btn-pill__arrow" aria-hidden="true">↗</span></a>
@@ -313,6 +374,7 @@
 
 <script src="js/main.js"></script>
 <script src="js/audit.js"></script>
+<script src="js/book.js"></script>
 <script type="module" src="js/hero.js"></script>
 <script type="module" src="js/network.js"></script>
 </body>

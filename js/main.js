@@ -1,4 +1,4 @@
-/* Dataverse — shared behaviour: light/dark toggle, scroll reveals, contact form. */
+/* Dataverse — shared behaviour: light/dark toggle and scroll reveals. */
 (function () {
   var root = document.documentElement;
   function syncModeLabel() {
@@ -39,16 +39,4 @@
     nodes.forEach(function (n) { io.observe(n); });
   }
 
-  /* Contact form — no backend yet, so it opens a prefilled email.
-     In Webflow, the native Form Block replaces this handler. */
-  var form = document.querySelector('[data-contact-form]');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var d = new FormData(form);
-      var body = 'Name: ' + d.get('name') + '\nEmail: ' + d.get('email') + '\n\n' + (d.get('message') || '');
-      window.location.href = 'mailto:hello@dataverse.ca?subject=' +
-        encodeURIComponent('Call request — ' + d.get('name')) + '&body=' + encodeURIComponent(body);
-    });
-  }
 })();
