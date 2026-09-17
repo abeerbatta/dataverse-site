@@ -9,9 +9,9 @@
 
   /* ---------- Card 1: guard messages become a shift report ---------- */
   var REPORT_MSGS = [
-    { who: 'Guard · Site 12', time: '18:04', text: 'On site, gates locked' },
-    { who: 'Guard · Site 12', time: '21:35', text: 'Loud group in lot, moved along' },
-    { who: 'Guard · Site 12', time: '02:10', text: 'Photo: broken light, east door' }
+    { who: 'Guard', time: '18:04', text: 'On site, gates locked' },
+    { who: 'Guard', time: '21:35', text: 'Loud group in lot, moved along' },
+    { who: 'Guard', time: '02:10', text: 'Photo: broken light, east door' }
   ];
   var REPORT_LOG = [
     ['18:00', 'Shift start. Perimeter walked, all gates secure.'],
@@ -43,6 +43,7 @@
     var logEl = card.querySelector('[data-demo-log]');
     var gridEl = card.querySelector('[data-demo-grid]');
     var totalEl = card.querySelector('[data-demo-total]');
+    var countEl = card.querySelector('[data-demo-count]');
     var timers = [];
     var countTimer = null;
 
@@ -57,6 +58,7 @@
       if (logEl) logEl.innerHTML = '';
       if (gridEl) gridEl.innerHTML = '';
       if (totalEl) totalEl.textContent = '0.0';
+      if (countEl) countEl.textContent = '0';
       card.classList.remove('is-done');
       pill.classList.remove('is-on');
     }
@@ -72,12 +74,12 @@
       timers.push(setTimeout(function () { li.classList.add('is-in'); }, 20));
     }
 
-    function countTo(target, ms) {
+    function countTo(node, target, ms, decimals) {
       var start = performance.now();
       clearInterval(countTimer);
       countTimer = setInterval(function () {
         var k = Math.min(1, (performance.now() - start) / ms);
-        totalEl.textContent = (target * (1 - Math.pow(1 - k, 3))).toFixed(1);
+        node.textContent = (target * (1 - Math.pow(1 - k, 3))).toFixed(decimals);
         if (k === 1) clearInterval(countTimer);
       }, 40);
     }
@@ -101,6 +103,7 @@
         card.classList.add('is-done');
         status('Report ready');
         pill.classList.add('is-on');
+        countTo(countEl, 67, 900, 0);
       });
       at(12000, runReport);
     }
@@ -119,7 +122,7 @@
           var c = el('span', 'demo__cell', v);
           gridEl.appendChild(c);
           timers.push(setTimeout(function () { c.classList.add('is-in'); }, 20));
-          countTo(SHEET_HOURS.slice(0, i + 1).reduce(function (a, b) { return a + b; }, 0), 420);
+          countTo(totalEl, SHEET_HOURS.slice(0, i + 1).reduce(function (a, b) { return a + b; }, 0), 420, 1);
         });
       });
       at(5900, function () {
@@ -142,6 +145,7 @@
           logEl.appendChild(li);
         });
         status('Report ready');
+        countEl.textContent = '67';
       } else {
         chatEl.innerHTML = '';
         SHEET_MSGS.forEach(bubble);
