@@ -180,6 +180,33 @@ img { max-width: 100%; display: block; }
 }
 .mode-toggle:hover { color: var(--ink); border-color: var(--ink); }
 
+/* Mobile header: logo + buttons on one row, nav links on a scrollable row below */
+@media (max-width: 760px) {
+  .site-header { gap: 12px 10px; padding-top: 12px; padding-bottom: 0; }
+  .logo { order: 1; margin-right: auto; font-size: 17px; }
+  .header-tools { order: 2; gap: 6px; flex-wrap: nowrap; }
+  .mode-toggle { padding: 7px 10px; font-size: 10px; }
+  .header-tools .btn--sm { font-size: 12.5px; padding: 8px 13px; }
+  .nav {
+    order: 3;
+    flex: 0 0 calc(100% + 2 * var(--gutter));
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 11px var(--gutter) 12px;
+    border-top: 1px solid var(--line);
+    flex-wrap: nowrap;
+    gap: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 380px) {
+  .logo { font-size: 15px; gap: 5px; }
+  .header-tools { gap: 5px; }
+  .mode-toggle { padding: 7px 8px; letter-spacing: 0.04em; }
+  .header-tools .btn--sm { font-size: 12px; padding: 8px 11px; }
+}
+
 /* ---------- Hero (3D) ---------- */
 /* Hero always renders dark, regardless of light/dark mode */
 .hero3d {
