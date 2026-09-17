@@ -82,19 +82,24 @@ function init(hero) {
   const home = new THREE.Group();
   scene.add(home);
   const LEG = 16;
+  // rx/h = arch size, w = how wide the band is, px/py = how far this arch drifts with the
+  // cursor (mixed signs so they pull apart instead of moving as one slab).
   const archSpecs = [
-    { rx: 2.7, h: 5.0 },
-    { rx: 2.5, h: 5.7 },
-    { rx: 2.3, h: 6.4 },
-    { rx: 2.1, h: 7.1 }
+    { rx: 2.9, h: 4.6, w: 1.55, px: 1.7, py: -0.5 },
+    { rx: 2.7, h: 5.2, w: 0.55, px: -1.0, py: 0.9 },
+    { rx: 2.5, h: 5.8, w: 1.15, px: 2.5, py: 0.3 },
+    { rx: 2.3, h: 6.3, w: 0.7, px: -1.8, py: -1.0 },
+    { rx: 2.1, h: 6.9, w: 1.35, px: 1.2, py: 1.3 },
+    { rx: 1.95, h: 7.4, w: 0.5, px: -2.3, py: 0.4 },
+    { rx: 1.8, h: 7.9, w: 0.95, px: 0.7, py: -1.5 }
   ];
   const arches = archSpecs.map((s, i) => {
     const pts = archPath(s.rx, s.h, LEG, 120);
     const legFrac = (LEG * 0.55) / pathLength(pts);
-    const mesh = addRibbon(home, pts, 0.1, 1.05, { range: [legFrac, 1 - legFrac], len: 2.4, dur: 1.5 + i * 0.2 });
-    const base = new THREE.Vector3(i * 1.7, -3.4 + i * 0.3, -i * 1.9);
+    const mesh = addRibbon(home, pts, 0.1, s.w, { range: [legFrac, 1 - legFrac], len: 2.4, dur: 1.4 + i * 0.15 });
+    const base = new THREE.Vector3(i * 1.75, -3.4 + i * 0.24, -i * 1.7);
     mesh.position.copy(base);
-    mesh.userData = { base, i };
+    mesh.userData = { base, i, px: s.px, py: s.py };
     return mesh;
   });
 
@@ -209,9 +214,9 @@ function init(hero) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const narrow = hero.clientWidth < 760;
-    layout.x = narrow ? -1.6 : 2.8;
+    layout.x = narrow ? -2.2 : 3.4;
     layout.y = narrow ? -1.2 : -2.2;
-    home.scale.setScalar(narrow ? 1.05 : 2);
+    home.scale.setScalar(narrow ? 0.95 : 1.75);
     if (reduced) render(0, 0);
   }
   new ResizeObserver(resize).observe(hero);
@@ -297,16 +302,18 @@ function init(hero) {
     follow.x += (pointer.x - follow.x) * k;
     follow.y += (pointer.y - follow.y) * k;
 
-    home.position.set(layout.x + follow.x * 2.6 * homeWeight, layout.y - follow.y * homeWeight, 0);
+    home.position.set(layout.x + follow.x * 1.3 * homeWeight, layout.y - follow.y * 0.5 * homeWeight, 0);
     home.rotation.set(
-      0.06 + follow.y * 0.1 * homeWeight,
-      -0.8 + Math.sin(t * 0.12) * 0.06 + follow.x * 0.35 * homeWeight,
+      0.06 + follow.y * 0.08 * homeWeight,
+      -0.8 + Math.sin(t * 0.12) * 0.06 + follow.x * 0.22 * homeWeight,
       -0.3
     );
     arches.forEach((m) => {
-      const { base, i } = m.userData;
-      m.position.y = base.y + Math.sin(t * 0.5 + i * 0.9) * 0.12;
-      m.rotation.z = Math.sin(t * 0.3 + i) * 0.02;
+      const { base, i, px, py } = m.userData;
+      // Each arch drifts its own way with the cursor, on top of the group's own slow sway.
+      m.position.x = base.x + follow.x * px * homeWeight;
+      m.position.y = base.y + Math.sin(t * 0.5 + i * 0.9) * 0.12 + follow.y * py * homeWeight;
+      m.rotation.z = Math.sin(t * 0.3 + i) * 0.02 + follow.x * 0.03 * py * homeWeight;
     });
     rings.rotation.z = 0.35 + t * 0.08;
 
