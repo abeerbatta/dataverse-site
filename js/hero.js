@@ -101,7 +101,7 @@ function init(hero) {
   const noiseTex = noiseTexture(256, mulberry32(4));
   noiseTex.wrapS = noiseTex.wrapT = THREE.RepeatWrapping;
 
-  const LAYERS = 9;
+  const LAYERS = 12;
   const clouds = [];
   const cloudGeo = new THREE.PlaneGeometry(1, 1);
   for (let i = 0; i < LAYERS; i++) {
@@ -112,12 +112,12 @@ function init(hero) {
         uMap: { value: noiseTex },
         uOffset: { value: new THREE.Vector2(rand() * 10, rand() * 10) },
         uDrift: { value: 0.006 + rand() * 0.012 },
-        uDensity: { value: 0.85 + rand() * 0.4 },
-        uOpacity: { value: 0.6 },
-        uDark: { value: new THREE.Color('#14090C') },
-        uLit: { value: new THREE.Color('#4A1512') },
+        uDensity: { value: 1.0 + rand() * 0.45 },
+        uOpacity: { value: 0.95 },
+        uDark: { value: new THREE.Color('#231923') },
+        uLit: { value: new THREE.Color('#C3B0B9') },
         uGlow: { value: new THREE.Color('#FF5C38') },
-        uGlowAmt: { value: 0.08 + rand() * 0.14 }
+        uGlowAmt: { value: 0.16 + rand() * 0.12 }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -140,15 +140,19 @@ function init(hero) {
         void main() {
           vec2 p = vUv + uOffset;
           float t = uTime * uDrift;
-          float n = texture2D(uMap, p * 1.0 + vec2(t, t * 0.3)).r * 0.55;
-          n += texture2D(uMap, p * 2.3 - vec2(t * 1.7, t * 0.5)).r * 0.3;
-          n += texture2D(uMap, p * 5.1 + vec2(t * 2.6, -t)).r * 0.15;
-          vec2 e = smoothstep(vec2(0.0), vec2(0.32), vUv) * smoothstep(vec2(0.0), vec2(0.32), 1.0 - vUv);
+          float n = texture2D(uMap, p * 0.35 + vec2(t, t * 0.3)).r * 0.55;
+          n += texture2D(uMap, p * 0.85 - vec2(t * 1.7, t * 0.5)).r * 0.3;
+          n += texture2D(uMap, p * 2.1 + vec2(t * 2.6, -t)).r * 0.15;
+          n *= uDensity;
+          // soften the quad edges so the decks have no visible seams
+          vec2 e = smoothstep(vec2(0.0), vec2(0.3), vUv) * smoothstep(vec2(0.0), vec2(0.3), 1.0 - vUv);
           float edge = e.x * e.y;
-          float a = smoothstep(0.40, 0.78, n * uDensity + 0.10) * edge * uOpacity;
-          float lift = smoothstep(0.0, 0.75, 1.0 - vUv.y);
-          vec3 col = mix(uDark, uLit, lift);
-          col += uGlow * lift * uGlowAmt * n;
+          // a firmer threshold gives billows an edge instead of a haze
+          float body = smoothstep(0.42, 0.72, n);
+          float a = body * edge * uOpacity;
+          // tops catch the light, the thick middle stays dark, undersides glow
+          vec3 col = mix(uDark, uLit, smoothstep(0.5, 0.95, n));
+          col += uGlow * uGlowAmt * smoothstep(0.42, 0.6, n) * (1.0 - body);
           gl_FragColor = vec4(col, a);
         }`,
       transparent: true,
@@ -157,10 +161,11 @@ function init(hero) {
     });
     // Horizontal decks: the camera rises through them, so they read as cloud cover
     const mesh = new THREE.Mesh(cloudGeo, mat);
-    const width = 260 + k * 420;
+    const width = 200 + k * 380;
     mesh.rotation.x = -Math.PI / 2;
     mesh.scale.set(width, width * 0.8, 1);
-    mesh.position.set((rand() - 0.5) * 60, -42 + i * 4.2 + (rand() - 0.5) * 1.8, -40 - k * 60);
+    // A thick bank just below eye level, thinning as it recedes
+    mesh.position.set((rand() - 0.5) * 50, -26 + i * 1.9 + (rand() - 0.5) * 1.2, -20 - k * 70);
     mesh.userData = { base: mesh.position.clone(), i, k };
     clouds.push(mesh);
     scene.add(mesh);
@@ -298,7 +303,7 @@ function init(hero) {
       const { base, i } = c.userData;
       c.material.uniforms.uTime.value = t;
       c.position.y = base.y + Math.sin(t * 0.08 + i) * 0.35;
-      c.material.uniforms.uOpacity.value = 0.6 * (1 - smoothstep(0.6, 1, progress) * 0.9);
+      c.material.uniforms.uOpacity.value = 0.95 * (1 - smoothstep(0.6, 1, progress) * 0.92);
     });
 
     starMat.uniforms.uTime.value = t;
