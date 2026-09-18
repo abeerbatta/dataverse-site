@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en-CA" data-mode="dark">
+<html lang="en-CA">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dataverse — Automation studio for small teams</title>
   <meta name="description" content="We find the hours your team loses to copy-paste, and build the automations that give them back.">
-  <script src="js/theme-init.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Familjen+Grotesk:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -16,17 +16,32 @@
 
   <!-- ===== Header (Webflow: make this a Component) ===== -->
   <header class="site-header">
-    <a href="#top" class="logo">Dataverse<span class="logo__dot"></span></a>
+    <a href="#top" class="logo" aria-label="Dataverse, home">
+      <svg class="logo__mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 3.5H12.5L19.5 8.5V15.5L12.5 20.5H4.5Z" stroke-opacity="0.55"/>
+          <path d="M10.75 12L19.5 8.5M10.75 12L4.5 20.5M10.75 12L4.5 3.5" stroke-opacity="0.35"/>
+        </g>
+        <circle cx="4.5" cy="3.5" r="1.55" fill="currentColor"/>
+        <circle cx="12.5" cy="3.5" r="1.55" fill="currentColor"/>
+        <circle cx="19.5" cy="8.5" r="2.1" fill="var(--accent)"/>
+        <circle cx="19.5" cy="15.5" r="1.55" fill="currentColor"/>
+        <circle cx="12.5" cy="20.5" r="1.55" fill="currentColor"/>
+        <circle cx="4.5" cy="20.5" r="1.55" fill="currentColor"/>
+        <circle cx="10.75" cy="12" r="1.9" fill="currentColor"/>
+      </svg>
+      <span class="logo__text">Dataverse</span>
+    </a>
     <nav class="nav">
       <a href="#services">Services</a>
       <a href="#process">Process</a>
       <a href="#audit" class="nav__link--accent">Time audit</a>
       <a href="#work">Work</a>
+      <a href="#faq">FAQ</a>
       <a href="blog/index.html">Blog</a>
     </nav>
     <div class="header-tools">
-      <button type="button" class="mode-toggle" data-toggle-mode>Light</button>
-      <a href="#contact" class="btn btn--primary btn--sm">Book a call</a>
+      <a href="#book" class="btn btn--primary btn--sm">Book a call</a>
     </div>
   </header>
 
@@ -52,7 +67,7 @@
       <div class="hero3d__side" data-reveal="3">
         <p class="hero3d__lede">We find the hours your team loses to copy-paste, and build the automations that give them back. No platform to buy. No jargon.</p>
         <div class="hero3d__actions">
-          <a href="#contact" class="btn-sq btn-sq--primary">Book a 30-minute call</a>
+          <a href="#book" class="btn-sq btn-sq--primary">Book a 30-minute call</a>
           <a href="#audit" class="btn-sq btn-sq--ghost">Run the five-minute audit</a>
         </div>
         <div class="hero3d__stats">
@@ -189,11 +204,36 @@
     <div class="work-head">
       <h2 class="h2">Selected work</h2>
       <p class="work-head__note">Two builds shipped by our founder before Dataverse, both for the same security company.</p>
+      <p class="work-head__hint">Scroll<span></span>→</p>
     </div>
     <div class="work">
       <article class="work__feature" data-reveal="1">
-        <div class="placeholder work__image">
-          <img src="assets/work-shift-report.jpg" alt="Shift report app: a generated patrol log open in the review editor" loading="lazy" width="1400" height="767">
+        <div class="demo" data-demo="report" aria-hidden="true">
+          <div class="demo__head">
+            <span class="demo__name">Report agent</span>
+            <span class="demo__status"><i class="demo__led"></i><span data-demo-status>Listening</span></span>
+          </div>
+          <div class="demo__body">
+            <div class="demo__meta">
+              <span class="demo__meta-main">Site 12 · night shift</span>
+              <span class="demo__meta-sub">17:00 – 06:00</span>
+            </div>
+            <ul class="demo__chat" data-demo-chat></ul>
+            <div class="demo__doc">
+              <div class="demo__doc-head">Daily Security Patrolling Log</div>
+              <ul class="demo__log" data-demo-log></ul>
+            </div>
+          </div>
+          <div class="demo__stats">
+            <div class="demo__stat">
+              <span class="demo__stat-label">Reports today</span>
+              <span class="demo__stat-value" data-demo-count>0</span>
+            </div>
+            <div class="demo__stat">
+              <span class="demo__stat-label">Human review</span>
+              <span class="demo__pill" data-demo-pill>Every one</span>
+            </div>
+          </div>
         </div>
         <div class="case-meta">
           <span class="text-accent">Founder build</span><span class="text-muted">Security company</span>
@@ -203,39 +243,269 @@
         <div class="case-result">≈ 16 hrs/day back — the equivalent of two full-time staff · 67 reports a day</div>
       </article>
       <article class="work__feature" data-reveal="2">
-        <div class="placeholder work__image">
-          <img class="img--top" src="assets/work-timesheet.jpg" alt="Google Sheet of guard hours filled in automatically" loading="lazy" width="1400" height="389">
-        </div>
-        <div>
-          <div class="case-meta">
-            <span class="text-accent">Founder build</span><span class="text-muted">Security company</span>
+        <div class="demo" data-demo="sheet" aria-hidden="true">
+          <div class="demo__head">
+            <span class="demo__name">Timesheet agent</span>
+            <span class="demo__status"><i class="demo__led"></i><span data-demo-status>Listening</span></span>
           </div>
-          <h3 class="case-title case-title--lg">Timesheets that file themselves</h3>
-          <p class="case-text case-text--lg">Guards send their hours — or a photo of a paper timesheet — to a business WhatsApp number, and it lands in the company's Google Sheet. Anyone who hasn't sent theirs gets a reminder. One person used to type all of it.</p>
-          <div class="case-result">≈ 8 hrs/week back · no more manual entry</div>
+          <div class="demo__body">
+            <div class="demo__meta">
+              <span class="demo__meta-main">Guard hours · March</span>
+              <span class="demo__meta-sub">16 – 22</span>
+            </div>
+            <ul class="demo__chat" data-demo-chat></ul>
+            <div class="demo__doc">
+              <div class="demo__doc-head">Timesheets — week 12</div>
+              <div class="demo__grid" data-demo-grid></div>
+            </div>
+          </div>
+          <div class="demo__stats">
+            <div class="demo__stat">
+              <span class="demo__stat-label">Hours this week</span>
+              <span class="demo__stat-value" data-demo-total>0.0</span>
+            </div>
+            <div class="demo__stat">
+              <span class="demo__stat-label">Chasing</span>
+              <span class="demo__pill" data-demo-pill>Reminder sent</span>
+            </div>
+          </div>
         </div>
+        <div class="case-meta">
+          <span class="text-accent">Founder build</span><span class="text-muted">Security company</span>
+        </div>
+        <h3 class="case-title case-title--lg">Timesheets that file themselves</h3>
+        <p class="case-text case-text--lg">Guards send their hours — or a photo of a paper timesheet — to a business WhatsApp number, and it lands in the company's Google Sheet. Anyone who hasn't sent theirs gets a reminder. One person used to type all of it.</p>
+        <div class="case-result">≈ 8 hrs/week back · no more manual entry</div>
+      </article>
+      <article class="work__feature" data-reveal="3">
+        <div class="demo" data-demo="call" aria-hidden="true">
+          <div class="demo__head">
+            <span class="demo__name">Receptionist agent</span>
+            <span class="demo__status"><i class="demo__led"></i><span data-demo-status>Ringing</span></span>
+          </div>
+          <div class="demo__body">
+            <div class="demo__call">
+              <span class="demo__call-icon" aria-hidden="true">☎</span>
+              <span class="demo__call-main">
+                <span class="demo__call-title" data-demo-answer>Incoming call</span>
+                <span class="demo__call-num">(416) 555-0188</span>
+              </span>
+              <span class="demo__call-timer" data-demo-timer>00:00</span>
+            </div>
+            <ul class="demo__lines" data-demo-lines></ul>
+            <div class="demo__chips" data-demo-chips></div>
+          </div>
+          <div class="demo__done" data-demo-done>
+            <span class="demo__done-main"><span class="demo__tick" aria-hidden="true">✓</span>Job created in the calendar</span>
+            <span class="demo__done-side">Confirmation texted</span>
+          </div>
+        </div>
+        <div class="case-meta">
+          <span class="text-accent">Demo</span><span class="text-muted">What we build next</span>
+        </div>
+        <h3 class="case-title case-title--lg">Never miss another call</h3>
+        <p class="case-text case-text--lg">Every call gets answered in seconds, day or night. The agent asks what's wrong, books the job into the calendar you already use, and texts the customer a confirmation.</p>
+        <div class="case-result">Illustrative — shown to explain the shape of the work</div>
       </article>
     </div>
   </section>
 
-  <!-- ===== Contact ===== -->
-  <section id="contact" class="contact">
-    <div class="contact__main">
-      <h2 class="contact__title">Tell us where the<br>week goes.</h2>
-      <p class="contact__text">Thirty minutes, no deck. Bring the task you're most tired of and we'll say honestly if automation is worth it.</p>
-      <a href="mailto:hello@dataverse.ca" class="contact__email">hello@dataverse.ca</a>
+  <!-- ===== Closing CTA over the constellation ===== -->
+  <section id="contact" class="contact" data-network>
+    <canvas class="network__canvas" aria-hidden="true"></canvas>
+    <div class="network__scrim" aria-hidden="true"></div>
+    <div class="contact__inner">
+      <p class="cta-eyebrow"><span class="cta-eyebrow__rule"></span>Ready when you are</p>
+      <h2 class="contact__title">Tell us where the week goes.</h2>
+      <p class="contact__text">Bring the task you're most tired of and we'll say honestly if automation is worth it.</p>
+      <a href="#book" class="btn-pill">Book a call<span class="btn-pill__arrow" aria-hidden="true">↗</span></a>
+      <p class="contact__note">30 minutes. No pitch deck.</p>
     </div>
-    <!-- Webflow: replace with a native Form Block using the same classes/field names -->
-    <form class="contact__form" name="contact" data-name="Contact" data-contact-form>
-      <input class="input input--lg" type="text" name="name" placeholder="Name" required>
-      <input class="input input--lg" type="email" name="email" placeholder="Email" required>
-      <textarea class="input input--lg" name="message" rows="4" placeholder="What's eating the most time?"></textarea>
-      <button type="submit" class="btn btn--primary contact__submit">Request a call</button>
-      <span class="contact__note">We reply within one business day.</span>
-    </form>
   </section>
 
-  <!-- ===== Footer (Webflow: make this a Component) ===== -->
+  <!-- ===== Book a call ===== -->
+  <section id="book" class="section book">
+    <div class="book__cols">
+      <div class="book__about">
+        <div class="eyebrow">Book a call</div>
+        <h2 class="book__head">Find out what your business can stop doing.</h2>
+        <p class="book__lede">One call. We look at how work moves through your business and show you what can come off your plate.</p>
+        <ol class="book__list">
+          <li>
+            <span class="book__n">01</span>
+            <div>
+              <h3 class="book__title">30 minutes, with the person who builds these</h3>
+              <p class="book__text">No sales deck. We ask how quotes, intake, scheduling and invoices move through your business today.</p>
+            </div>
+          </li>
+          <li>
+            <span class="book__n">02</span>
+            <div>
+              <h3 class="book__title">We map your week</h3>
+              <p class="book__text">Where the hours go, which jobs slip through the cracks, and what each one costs you.</p>
+            </div>
+          </li>
+          <li>
+            <span class="book__n">03</span>
+            <div>
+              <h3 class="book__title">You leave with a short list</h3>
+              <p class="book__text">The first things worth automating, in order. Yours to keep either way.</p>
+            </div>
+          </li>
+        </ol>
+        <a href="mailto:hello@dataverse.ca" class="book__email">hello@dataverse.ca</a>
+      </div>
+
+      <!-- Webflow: rebuild as a native Form Block; keep the field names below -->
+      <form class="bform" name="call-request" data-name="Call request" data-book-form novalidate>
+        <div class="bform__glow" aria-hidden="true"></div>
+        <header class="bform__head">
+          <span class="eyebrow">Call request</span>
+          <span class="bform__count" data-book-count>0 / 8</span>
+        </header>
+        <div class="bform__dots" data-book-dots aria-hidden="true"></div>
+
+        <div class="bform__grid">
+          <label class="bf">
+            <input class="bf__input" type="text" name="name" placeholder=" " autocomplete="name" data-book-field>
+            <span class="bf__label">Your name</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="text" name="business" placeholder=" " autocomplete="organization" data-book-field>
+            <span class="bf__label">Business name</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="email" name="email" placeholder=" " autocomplete="email" data-book-field>
+            <span class="bf__label">Email</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+          <label class="bf">
+            <input class="bf__input" type="tel" name="phone" placeholder=" " autocomplete="tel" data-book-field>
+            <span class="bf__label">Phone</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+
+          <label class="bf">
+            <select class="bf__input bf__select" name="industry" data-book-field>
+              <option value="" selected></option>
+              <option>Trades &amp; home services</option>
+              <option>Law / accounting</option>
+              <option>Clinic</option>
+              <option>Brokerage</option>
+              <option>Restaurant</option>
+              <option>Something else</option>
+            </select>
+            <span class="bf__label">Your line of work</span>
+            <span class="bf__chev" aria-hidden="true">⌄</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+
+          <div class="bf bf--seg">
+            <span class="bf__legend">Preferred call time</span>
+            <div class="seg" role="radiogroup" aria-label="Preferred call time" data-book-seg="callTime">
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Morning</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Afternoon</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Evening</button>
+            </div>
+            <input type="hidden" name="callTime" data-book-field>
+          </div>
+
+          <div class="bf bf--seg bf--wide">
+            <span class="bf__legend">Team size, including you</span>
+            <div class="seg" role="radiogroup" aria-label="Team size" data-book-seg="size">
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">Just me</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">2 to 5</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">6 to 15</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">16 to 50</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false">50+</button>
+            </div>
+            <input type="hidden" name="size" data-book-field>
+          </div>
+
+          <label class="bf bf--wide">
+            <textarea class="bf__input bf__area" name="message" rows="3" placeholder=" " data-book-field></textarea>
+            <span class="bf__label">What wastes the most of your time?</span>
+            <span class="bf__dot" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="bform__foot">
+          <button type="submit" class="btn-pill">Request my call<span class="btn-pill__arrow" aria-hidden="true">↗</span></button>
+          <p class="bform__note">No spam, no list. We only use this to set up your call.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" class="section faq">
+    <div class="section-head">
+      <h2 class="h2 section-head__title">Common questions</h2>
+      <p class="section-head__text">Straight answers. If yours isn't here, ask us on the call. We'd rather tell you something won't pay for itself than sell it to you.</p>
+    </div>
+    <div class="faq__list">
+      <details class="faq__item" open>
+        <summary class="faq__q">
+          <span>What does it cost?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>We quote you a fixed price after the first call, so you know the number before anything starts. No hourly billing, no invoice that creeps up on you. The audit is priced on its own, and plenty of people stop there and keep the plan.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>How long until something is live?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>The audit takes about two weeks. Most first builds are running about three weeks after we first talk. We put one thing live, you live with it for a week, then we move on to the next one.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>Do we have to change the software we already use?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>No. We build on whatever you already pay for, whether that's QuickBooks, Google Workspace, your CRM or your booking software. And if most of it lives in spreadsheets and someone's head, that's fine too. We've seen worse.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>What happens when it gets something wrong?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>It will get something wrong now and then. That's why anything a customer sees waits for one of your people to okay it, and why you set the limits on what it can do by itself. Everything it does gets written down, so you can go back and see what happened. If something breaks, we fix it that day.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>Do we need someone technical to run it?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>No. We write it all down in plain language and sit with whoever is going to own it. The bar we hold ourselves to is simple. Your team should be able to change it without calling us.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>Who owns the data?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>You do. Your records, your documents, your customers. It stays in your systems. We don't sell it, we don't share it, and we don't train anything on it. If we ever part ways, you keep everything we built.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>What if we only want one piece?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>Then buy one piece. Some people just want the audit. Others want one job fixed and nothing else. You can always come back for the next thing months later.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span>Who is this for?</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__a"><p>Canadian businesses with roughly 5 to 50 people. Trades and home services, clinics, law and accounting firms, brokerages, restaurants. Small enough that the owner still feels every wasted hour, big enough that the same job comes round every week.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <div class="footer-wordmark" aria-hidden="true">Dataverse</div>
   <footer class="site-footer">
     <span class="site-footer__brand">Dataverse</span>
     <span>Automation &amp; AI adoption</span>
@@ -246,6 +516,9 @@
 
 <script src="js/main.js"></script>
 <script src="js/audit.js"></script>
+<script src="js/book.js"></script>
+<script src="js/demos.js"></script>
 <script type="module" src="js/hero.js"></script>
+<script type="module" src="js/network.js"></script>
 </body>
 </html>

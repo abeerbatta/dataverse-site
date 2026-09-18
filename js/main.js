@@ -1,22 +1,5 @@
-/* Dataverse — shared behaviour: light/dark toggle, scroll reveals, contact form. */
+/* Dataverse — shared behaviour: scroll reveals. */
 (function () {
-  var root = document.documentElement;
-  function syncModeLabel() {
-    var light = root.getAttribute('data-mode') === 'light';
-    document.querySelectorAll('[data-toggle-mode]').forEach(function (b) {
-      b.textContent = light ? 'Dark' : 'Light';
-    });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('[data-toggle-mode]')) return;
-    var next = root.getAttribute('data-mode') === 'light' ? 'dark' : 'light';
-    root.setAttribute('data-mode', next);
-    syncModeLabel();
-    try { localStorage.setItem('dv-mode', next); } catch (err) {}
-  });
-  syncModeLabel();
-
   /* Scroll reveals — elements stay visible if JS or IntersectionObserver is unavailable. */
   var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -39,16 +22,4 @@
     nodes.forEach(function (n) { io.observe(n); });
   }
 
-  /* Contact form — no backend yet, so it opens a prefilled email.
-     In Webflow, the native Form Block replaces this handler. */
-  var form = document.querySelector('[data-contact-form]');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var d = new FormData(form);
-      var body = 'Name: ' + d.get('name') + '\nEmail: ' + d.get('email') + '\n\n' + (d.get('message') || '');
-      window.location.href = 'mailto:hello@dataverse.ca?subject=' +
-        encodeURIComponent('Call request — ' + d.get('name')) + '&body=' + encodeURIComponent(body);
-    });
-  }
 })();
