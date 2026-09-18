@@ -296,10 +296,10 @@ img { max-width: 100%; display: block; }
 body.is-journey .site-header { opacity: 0; pointer-events: none; }
 
 /* Scroll runway: the fixed 3D stage plays while this scrolls past */
-.hero-journey { display: none; height: 300vh; overflow-anchor: none; }
+.hero-journey { display: none; height: 190vh; overflow-anchor: none; }
 .hero-journey.is-ready { display: block; }
 @media (max-width: 760px) {
-  .hero-journey { height: 240vh; }
+  .hero-journey { height: 150vh; }
 }
 
 /* Content */

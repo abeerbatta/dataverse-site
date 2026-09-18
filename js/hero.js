@@ -330,7 +330,7 @@ function init(hero) {
     camera.rotation.set(0.12 + p * 0.22 + follow.y * 0.04, follow.x * 0.06, Math.sin(t * 0.05) * 0.01 + p * 0.05);
 
     cloudMat.uniforms.uTime.value = t;
-    cloudMat.uniforms.uCamY.value = 0.62 + p * 1.5;                 // sit above the deck, then climb
+    cloudMat.uniforms.uCamY.value = 1.05 + p * 1.5;                 // sit above the deck, then climb
     cloudMat.uniforms.uPitch.value = follow.y * 0.04 - p * 0.28;
     cloudMat.uniforms.uFade.value = 1 - smoothstep(0.6, 1, progress) * 0.95;
 
