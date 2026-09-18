@@ -95,81 +95,136 @@ function init(hero) {
   const stars = new THREE.Points(starGeo, starMat);
   scene.add(stars);
 
-  /* ---------- Cloud banks ----------
-     Each bank is one quad sampling a tiling noise texture at three scales, so it reads as
-     soft cloud rather than a repeating tile. Cheap: no noise maths in the shader. */
+  /* ---------- Clouds ----------
+     Raymarched, not stacked planes: for every pixel we walk the ray through a slab of
+     noise and accumulate density, so the bank has depth and the camera can rise through
+     it. Rendered at half resolution into a texture and drawn over the stars, which keeps
+     the step count affordable. */
   const noiseTex = noiseTexture(256, mulberry32(4));
   noiseTex.wrapS = noiseTex.wrapT = THREE.RepeatWrapping;
+  noiseTex.minFilter = noiseTex.magFilter = THREE.LinearFilter;
 
-  const LAYERS = 12;
-  const clouds = [];
-  const cloudGeo = new THREE.PlaneGeometry(1, 1);
-  for (let i = 0; i < LAYERS; i++) {
-    const k = i / (LAYERS - 1);
-    const mat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-        uMap: { value: noiseTex },
-        uOffset: { value: new THREE.Vector2(rand() * 10, rand() * 10) },
-        uDrift: { value: 0.006 + rand() * 0.012 },
-        uDensity: { value: 1.0 + rand() * 0.45 },
-        uOpacity: { value: 0.95 },
-        uDark: { value: new THREE.Color('#231923') },
-        uLit: { value: new THREE.Color('#C3B0B9') },
-        uGlow: { value: new THREE.Color('#FF5C38') },
-        uGlowAmt: { value: 0.16 + rand() * 0.12 }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }`,
-      fragmentShader: `
-        uniform sampler2D uMap;
-        uniform vec2 uOffset;
-        uniform float uTime;
-        uniform float uDrift;
-        uniform float uDensity;
-        uniform float uOpacity;
-        uniform float uGlowAmt;
-        uniform vec3 uDark;
-        uniform vec3 uLit;
-        uniform vec3 uGlow;
-        varying vec2 vUv;
-        void main() {
-          vec2 p = vUv + uOffset;
-          float t = uTime * uDrift;
-          float n = texture2D(uMap, p * 0.35 + vec2(t, t * 0.3)).r * 0.55;
-          n += texture2D(uMap, p * 0.85 - vec2(t * 1.7, t * 0.5)).r * 0.3;
-          n += texture2D(uMap, p * 2.1 + vec2(t * 2.6, -t)).r * 0.15;
-          n *= uDensity;
-          // soften the quad edges so the decks have no visible seams
-          vec2 e = smoothstep(vec2(0.0), vec2(0.3), vUv) * smoothstep(vec2(0.0), vec2(0.3), 1.0 - vUv);
-          float edge = e.x * e.y;
-          // a firmer threshold gives billows an edge instead of a haze
-          float body = smoothstep(0.42, 0.72, n);
-          float a = body * edge * uOpacity;
-          // tops catch the light, the thick middle stays dark, undersides glow
-          vec3 col = mix(uDark, uLit, smoothstep(0.5, 0.95, n));
-          col += uGlow * uGlowAmt * smoothstep(0.42, 0.6, n) * (1.0 - body);
-          gl_FragColor = vec4(col, a);
-        }`,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide
-    });
-    // Horizontal decks: the camera rises through them, so they read as cloud cover
-    const mesh = new THREE.Mesh(cloudGeo, mat);
-    const width = 200 + k * 380;
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.scale.set(width, width * 0.8, 1);
-    // A thick bank just below eye level, thinning as it recedes
-    mesh.position.set((rand() - 0.5) * 50, -26 + i * 1.9 + (rand() - 0.5) * 1.2, -20 - k * 70);
-    mesh.userData = { base: mesh.position.clone(), i, k };
-    clouds.push(mesh);
-    scene.add(mesh);
-  }
+  const cloudTarget = new THREE.WebGLRenderTarget(2, 2, {
+    magFilter: THREE.LinearFilter,
+    minFilter: THREE.LinearFilter,
+    depthBuffer: false
+  });
+
+  const cloudMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uNoise: { value: noiseTex },
+      uTime: { value: 0 },
+      uAspect: { value: 1.6 },
+      uCamY: { value: 0 },        // rises during the climb
+      uPitch: { value: 0 },       // cursor tilt
+      uYaw: { value: 0 },
+      uFade: { value: 1 },        // thins out once above the deck
+      uDeep: { value: new THREE.Color('#2A1C26') },
+      uLit: { value: new THREE.Color('#D8CBD2') },
+      uGlow: { value: new THREE.Color('#FF5C38') }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position.xy, 0.0, 1.0);
+      }`,
+    fragmentShader: `
+      precision highp float;
+      uniform sampler2D uNoise;
+      uniform float uTime, uAspect, uCamY, uPitch, uYaw, uFade;
+      uniform vec3 uDeep, uLit, uGlow;
+      varying vec2 vUv;
+
+      // 3D value noise from a 2D texture holding two neighbouring slices (r and g)
+      float noise3(vec3 p) {
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        vec2 uv = (i.xz + vec2(37.0, 17.0) * i.y) + f.xz;
+        vec2 rg = texture2D(uNoise, (uv + 0.5) / 256.0).rg;
+        return mix(rg.x, rg.y, f.y);
+      }
+
+      float fbm(vec3 p) {
+        float v = 0.0, amp = 0.55;
+        for (int i = 0; i < 4; i++) {
+          v += noise3(p) * amp;
+          p *= 2.02;
+          amp *= 0.5;
+        }
+        return v;
+      }
+
+      // Density inside a slab of sky, thinning towards its top and bottom
+      float density(vec3 p) {
+        // a slab of cloud sitting below the eye
+        float h = smoothstep(-34.0, -24.0, p.y) * smoothstep(-6.0, -18.0, p.y);
+        if (h <= 0.0) return 0.0;
+        vec3 q = p * 0.085;
+        q.x += uTime * 0.004;
+        q.z += uTime * 0.002;
+        float d = fbm(q) - 0.34;
+        return clamp(d, 0.0, 1.0) * h;
+      }
+
+      void main() {
+        vec2 uv = vUv * 2.0 - 1.0;
+        vec3 dir = normalize(vec3(uv.x * uAspect, uv.y * 0.62 + uPitch, -1.0));
+        dir.xz = mat2(cos(uYaw), -sin(uYaw), sin(uYaw), cos(uYaw)) * dir.xz;
+        vec3 ro = vec3(0.0, uCamY, 0.0);
+
+        vec4 acc = vec4(0.0);
+        float t = 6.0;
+        for (int i = 0; i < 34; i++) {
+          if (acc.a > 0.97) break;
+          vec3 p = ro + dir * t;
+          float d = density(p);
+          if (d > 0.001) {
+            // cheap shading: compare density a little above, so tops read lighter
+            float lift = clamp((d - density(p + vec3(0.0, 3.0, 0.0))) * 3.0, 0.0, 1.0);
+            vec3 col = mix(uDeep, uLit, clamp(lift * 3.0, 0.0, 1.0));
+            col += uGlow * 0.22 * smoothstep(0.02, 0.28, d) * (1.0 - lift);
+            float a = clamp(d * 7.0, 0.0, 1.0) * 0.5;
+            acc.rgb += (1.0 - acc.a) * col * a;
+            acc.a += (1.0 - acc.a) * a;
+          }
+          t += 1.6 + t * 0.055;
+        }
+        gl_FragColor = vec4(acc.rgb, acc.a * uFade);
+      }`,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false
+  });
+
+  // A single triangle covering the screen, rendered with its own flat camera
+  const screenGeo = new THREE.BufferGeometry();
+  screenGeo.setAttribute('position', new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
+  screenGeo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 2, 0, 0, 2], 2));
+  const flatCam = new THREE.Camera();
+  const cloudScene = new THREE.Scene();
+  cloudScene.add(new THREE.Mesh(screenGeo, cloudMat));
+
+  // The half-res cloud texture, drawn over the stars
+  const compositeMat = new THREE.ShaderMaterial({
+    uniforms: { uMap: { value: cloudTarget.texture } },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position.xy, 0.0, 1.0);
+      }`,
+    fragmentShader: `
+      uniform sampler2D uMap;
+      varying vec2 vUv;
+      void main() { gl_FragColor = texture2D(uMap, vUv); }`,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false
+  });
+  const compositeScene = new THREE.Scene();
+  compositeScene.add(new THREE.Mesh(screenGeo, compositeMat));
 
   /* ---------- Taglines ---------- */
   const phrases = (hero.dataset.taglines || '').split('|').map((s) => s.trim()).filter(Boolean);
@@ -217,6 +272,8 @@ function init(hero) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     starMat.uniforms.uScale.value = renderer.getPixelRatio() * h * 0.6;
+    cloudMat.uniforms.uAspect.value = w / h;
+    cloudTarget.setSize(Math.max(2, Math.round(w * 0.5)), Math.max(2, Math.round(h * 0.5)));
     if (reduced) render(0, 0);
   }
   const ro = new ResizeObserver(() => { needsResize = true; });
@@ -299,18 +356,25 @@ function init(hero) {
     camera.position.set(follow.x * 1.6, -2 + p * 46 + follow.y * -1.2, 22 - p * 150);
     camera.rotation.set(0.12 + p * 0.22 + follow.y * 0.04, follow.x * 0.06, Math.sin(t * 0.05) * 0.01 + p * 0.05);
 
-    clouds.forEach((c) => {
-      const { base, i } = c.userData;
-      c.material.uniforms.uTime.value = t;
-      c.position.y = base.y + Math.sin(t * 0.08 + i) * 0.35;
-      c.material.uniforms.uOpacity.value = 0.95 * (1 - smoothstep(0.6, 1, progress) * 0.92);
-    });
+    cloudMat.uniforms.uTime.value = t;
+    cloudMat.uniforms.uCamY.value = -6 + p * 34;
+    cloudMat.uniforms.uPitch.value = 0.12 + follow.y * 0.05 - p * 0.35;
+    cloudMat.uniforms.uYaw.value = follow.x * 0.12;
+    cloudMat.uniforms.uFade.value = 1 - smoothstep(0.62, 1, progress) * 0.95;
 
     starMat.uniforms.uTime.value = t;
     stars.rotation.y = follow.x * 0.03 + t * 0.002;
 
     resize();
+    // clouds at half resolution, then stars, then the clouds over the top
+    renderer.setRenderTarget(cloudTarget);
+    renderer.clear();
+    renderer.render(cloudScene, flatCam);
+    renderer.setRenderTarget(null);
     renderer.render(scene, camera);
+    renderer.autoClear = false;
+    renderer.render(compositeScene, flatCam);
+    renderer.autoClear = true;
 
     words.forEach((w, i) => {
       const [a, b] = windows[i];
@@ -367,34 +431,25 @@ function init(hero) {
   requestAnimationFrame(frame);
 }
 
-/* A tiling value-noise texture, built once on a canvas so the shader stays cheap. */
+/* Noise texture for the cloud raymarch: white noise, one value per texel, with the green
+   channel holding the neighbouring slice. The shader's bilinear reads turn it into smooth
+   3D value noise, which is what gives the clouds their billows. */
 function noiseTexture(size, rnd) {
-  const grid = 32;
-  const pts = [];
-  for (let y = 0; y <= grid; y++) {
-    pts[y] = [];
-    for (let x = 0; x <= grid; x++) {
-      pts[y][x] = x === grid ? pts[y][0] : y === grid ? pts[0][x] : rnd();
-    }
-  }
+  const r = new Uint8Array(size * size);
+  for (let i = 0; i < r.length; i++) r[i] = Math.floor(rnd() * 256);
+
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const ctx = c.getContext('2d');
   const img = ctx.createImageData(size, size);
-  const fade = (v) => v * v * (3 - 2 * v);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      const gx = (x / size) * grid;
-      const gy = (y / size) * grid;
-      const x0 = Math.floor(gx);
-      const y0 = Math.floor(gy);
-      const fx = fade(gx - x0);
-      const fy = fade(gy - y0);
-      const v = (pts[y0][x0] * (1 - fx) + pts[y0][x0 + 1] * fx) * (1 - fy) +
-        (pts[y0 + 1][x0] * (1 - fx) + pts[y0 + 1][x0 + 1] * fx) * fy;
       const i = (y * size + x) * 4;
-      const b = Math.round(v * 255);
-      img.data[i] = img.data[i + 1] = img.data[i + 2] = b;
+      // the slice offset the shader steps by: (37, 17)
+      const j = ((y + 17) % size) * size + ((x + 37) % size);
+      img.data[i] = r[y * size + x];
+      img.data[i + 1] = r[j];
+      img.data[i + 2] = 0;
       img.data[i + 3] = 255;
     }
   }
