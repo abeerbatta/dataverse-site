@@ -7,8 +7,7 @@ index.html          Home (hero, services, process, time audit, work, pricing, co
 blog/index.html     Blog listing  → Webflow Collection List page
 blog/post.html      Post template → Webflow "Blog Posts Template" page
 css/styles.css      All styles. Class-based, no inline styles. Theme tokens at top.
-js/theme-init.js    Restores saved light/dark mode before paint (in <head>)
-js/main.js          Light/dark toggle, scroll reveals, contact form
+js/main.js          Scroll reveals
 js/audit.js         Five-minute time audit calculator
 js/book.js          Call request form (progress, segmented choices, cursor glow)
 js/demos.js         Looping mini-UI demos in Selected work
@@ -24,8 +23,7 @@ All copy is in the HTML files. Audit calculator copy/maths (industries, tasks, b
 Image placeholders are `.placeholder` blocks — drop an `<img>` inside and it fills the frame.
 
 ## Theme
-Fixed palette (Ember red) and font set (Syne / Familjen Grotesk / Azeret Mono), defined as CSS variables at the top of `css/styles.css`.
-Header has a light/dark toggle (`data-mode` on `<html>`, remembered in localStorage).
+One dark palette (Ember red) and one font set (Syne / Familjen Grotesk / Azeret Mono), defined as CSS variables at the top of `css/styles.css`.
 
 ## Hero
 3D scene in `js/hero.js` (Three.js).
@@ -61,7 +59,7 @@ Webflow: add the hero markup + runway div as an Embed and load `js/hero.js` with
 2. Header and footer → Components.
 3. `blog/index.html`: the `.w-dyn-list > .w-dyn-items > .w-dyn-item` block is a Collection List bound to Blog Posts, sorted by published date desc. Bind each field from the sample item, delete the other two samples.
 4. `blog/post.html`: build the Collection Template page; bind each `data-cms` element to the field of the same slug. `.w-richtext` styles already cover h2/h3/h4, lists, quotes, figures, code.
-5. Time audit: paste the `#audit` section markup + `js/audit.js` into an Embed (or page custom code). Light/dark toggle: `js/theme-init.js` in head code, `js/main.js` before `</body>`.
+5. Time audit: paste the `#audit` section markup + `js/audit.js` into an Embed (or page custom code). Load `js/main.js` before `</body>` for the scroll reveals.
 6. Call request form (`#book`): rebuild as a native Form Block keeping the field names (`name`, `business`, `email`, `phone`, `industry`, `callTime`, `size`, `message`). Currently `js/book.js` opens a prefilled email on submit.
 
 ### Option B — keep static hosting, pull posts from Webflow

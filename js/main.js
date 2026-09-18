@@ -1,22 +1,5 @@
-/* Dataverse — shared behaviour: light/dark toggle and scroll reveals. */
+/* Dataverse — shared behaviour: scroll reveals. */
 (function () {
-  var root = document.documentElement;
-  function syncModeLabel() {
-    var light = root.getAttribute('data-mode') === 'light';
-    document.querySelectorAll('[data-toggle-mode]').forEach(function (b) {
-      b.textContent = light ? 'Dark' : 'Light';
-    });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('[data-toggle-mode]')) return;
-    var next = root.getAttribute('data-mode') === 'light' ? 'dark' : 'light';
-    root.setAttribute('data-mode', next);
-    syncModeLabel();
-    try { localStorage.setItem('dv-mode', next); } catch (err) {}
-  });
-  syncModeLabel();
-
   /* Scroll reveals — elements stay visible if JS or IntersectionObserver is unavailable. */
   var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

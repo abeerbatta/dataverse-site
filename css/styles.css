@@ -1,11 +1,11 @@
 /* ==========================================================================
    Dataverse — site styles
    Class-based (no inline styles) so the markup ports cleanly into Webflow.
-   Theme = data-mode (dark|light) on <html>. All colours/fonts flow from the tokens below.
+   One dark palette; all colours and fonts flow from the tokens below.
    ========================================================================== */
 
 /* ---------- Tokens ---------- */
-/* Brand palette (Ember). Light mode via data-mode="light" on <html>. */
+/* Brand palette (Ember) */
 :root {
   --bg: #100C10; --surface: #191219; --ink: #F0EAEE; --muted: #9A8E97;
   --line: #2A212A; --accent: #FF5C38; --accent-ink: #100C10;
@@ -13,11 +13,6 @@
   --body: 'Familjen Grotesk';
   --mono: 'Azeret Mono';
   color-scheme: dark;
-}
-:root[data-mode="light"] {
-  --bg: #F4EFF2; --surface: #FCF8FA; --ink: #161015; --muted: #6A5D67;
-  --line: #E2D7DE; --accent: #C8351A; --accent-ink: #FFF4F0;
-  color-scheme: light;
 }
 
 :root {
@@ -197,14 +192,6 @@ img { max-width: 100%; display: block; }
   flex: 0 0 auto;
   white-space: nowrap;
 }
-.mode-toggle {
-  font-family: var(--f-mono); font-size: 11px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 8px 12px; border: 1px solid var(--line); border-radius: 99px;
-  background: transparent; color: var(--muted); cursor: pointer;
-  flex: 0 0 auto; white-space: nowrap;
-}
-.mode-toggle:hover { color: var(--ink); border-color: var(--ink); }
 
 /* Mobile header: logo + buttons on one row, nav links on a scrollable row below */
 @media (max-width: 760px) {
@@ -213,7 +200,6 @@ img { max-width: 100%; display: block; }
   .logo__mark { width: 22px; height: 22px; }
   .logo__text { font-size: 17px; }
   .header-tools { order: 2; gap: 6px; flex-wrap: nowrap; }
-  .mode-toggle { padding: 7px 10px; font-size: 10px; }
   .header-tools .btn--sm { font-size: 12.5px; padding: 8px 13px; }
   .nav {
     order: 3;
@@ -233,12 +219,10 @@ img { max-width: 100%; display: block; }
   .logo__mark { width: 20px; height: 20px; }
   .logo__text { font-size: 15px; }
   .header-tools { gap: 5px; }
-  .mode-toggle { padding: 7px 8px; letter-spacing: 0.04em; }
   .header-tools .btn--sm { font-size: 12px; padding: 8px 11px; }
 }
 
 /* ---------- Hero (3D) ---------- */
-/* Hero always renders dark, regardless of light/dark mode */
 .hero3d {
   --bg: #100C10; --surface: #191219; --ink: #F0EAEE; --muted: #9A8E97;
   --line: rgba(240, 234, 238, 0.14); --accent: #FF5C38; --accent-ink: #100C10;
