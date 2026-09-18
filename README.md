@@ -26,15 +26,12 @@ Image placeholders are `.placeholder` blocks — drop an `<img>` inside and it f
 One dark palette (Ember red) and one font set (Syne / Familjen Grotesk / Azeret Mono), defined as CSS variables at the top of `css/styles.css`.
 
 ## Hero
-3D scene in `js/hero.js` (Three.js).
-- Top of page: ribbon arches follow the cursor; light streaks run along them now and then.
-- Scrolling down plays the fly-through on a full-screen stage: the camera passes through the arches, a slab field and a ring stack while three tagline phrases assemble letter by letter. Scrolling up rewinds it while it is still running.
-- It plays once per visit: once the runway has scrolled fully out of sight, `finish()` collapses it (and corrects the scroll position) so scrolling back up shows the plain hero. Reloading the page arms it again.
-- Length of the fly-through = height of the runway `.hero-journey` in `css/styles.css` (300vh desktop, 240vh mobile).
-- Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html` (last word of each phrase is highlighted).
-- Tuning in `js/hero.js`: word windows `windows`, word positions `spots`, camera path `keys`, scroll smoothing `dt * 5`.
-Falls back to the CSS gradient (and no runway) if WebGL is unavailable or for reduced-motion users.
-Webflow: add the hero markup + runway div as an Embed and load `js/hero.js` with `<script type="module">` in page custom code.
+Night sky in `js/hero.js` (Three.js).
+- Idle: a deep star field (a few stars tinted with the brand red) above slow cloud decks, both leaning with the cursor.
+- Scrolling down climbs up through the cloud decks into clear sky on a full-screen stage, with three tagline phrases assembling letter by letter. Scrolling up rewinds; once past the end the runway collapses and it plays only once per visit.
+- Clouds are quads sampling one tiling noise texture (built on a canvas at load) at three scales, so the shader stays cheap. Tune `LAYERS`, `uDensity`, `uOpacity`, and the deck positions.
+- Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html`.
+Falls back to the CSS gradient (and no runway) without WebGL or for reduced-motion visitors.
 
 ## Constellation network
 `js/network.js` draws the closing scene behind the contact section: nodes joined by links drawn as fine dust, a few nodes in the accent colour, pulses of light running the links, and a far star field. It leans with the cursor and drifts as the section scrolls. Node count, link distance and pulse count are the values at the top of the file. Only renders while that section is on screen; skipped without WebGL or for reduced-motion visitors.

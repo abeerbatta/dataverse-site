@@ -235,9 +235,8 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   color: var(--ink);
   background:
-    radial-gradient(60% 70% at 78% 60%, rgba(255, 92, 56, 0.16), transparent 70%),
-    radial-gradient(40% 50% at 10% 0%, rgba(255, 46, 99, 0.06), transparent 70%),
-    #100C10;
+    radial-gradient(90% 60% at 50% 108%, rgba(255, 92, 56, 0.2), transparent 70%),
+    linear-gradient(180deg, #05050A 0%, #0B0710 45%, #150A0C 100%);
 }
 .hero3d a { color: inherit; }
 .hero3d__stage { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }

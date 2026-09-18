@@ -1,23 +1,13 @@
-/* Dataverse — hero 3D scene (Three.js).
-   Idle: ribbon arches drift and follow the cursor; light streaks run along the ribbons.
+/* Dataverse — hero night sky (Three.js).
+   Idle: a deep star field behind slow cloud banks, both leaning with the cursor.
    Scrolling down from the hero plays a fly-through on a full-screen stage: the camera
-   passes through the arches, a field of slabs and a stack of rings while tagline words
-   assemble letter by letter. The scroll runway ([data-hero-journey]) sets its length;
-   at the end the stage fades out, the runway collapses so the fly-through plays only once
-   per visit, and the rest of the page scrolls in. Scrolling up before the end rewinds.
+   climbs up through the cloud layers into clear sky while tagline words assemble letter
+   by letter. The scroll runway ([data-hero-journey]) sets its length; at the end the stage
+   fades out, the runway collapses so the fly-through plays only once per visit, and the
+   rest of the page scrolls in. Scrolling up before the end rewinds.
    Falls back to the CSS gradient background (and no runway) if WebGL is unavailable. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js';
-import {
-  archPath,
-  circlePath,
-  pathLength,
-  ribbonGeometry,
-  streakMaterial,
-  dotTexture,
-  smoothstep,
-  easeInOut,
-  mulberry32
-} from './ribbon.js';
+import { dotTexture, smoothstep, easeInOut, mulberry32 } from './ribbon.js';
 
 const hero = document.querySelector('[data-hero3d]');
 if (hero) init(hero);
@@ -37,141 +27,144 @@ function init(hero) {
     hero.classList.add('is-static');
     return;
   }
-  // 1.5 is plenty for a soft, dark scene and roughly halves the pixels on a Retina screen
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x100c10, 16, 34);
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
+  const rand = mulberry32(9);
 
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
-
-  /* ---------- Lights ---------- */
-  scene.add(new THREE.HemisphereLight(0xff8a6a, 0x100c10, 0.55));
-  const key = new THREE.DirectionalLight(0xff5c38, 3.2);
-  key.position.set(7, 9, 8);
-  scene.add(key);
-  const fill = new THREE.DirectionalLight(0xff2e63, 1.4);
-  fill.position.set(-9, 1, 5);
-  scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xffd2c4, 1.1);
-  rim.position.set(-2, 6, -10);
-  scene.add(rim);
-
-  const ribbonMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#5c1a14'),
-    roughness: 0.48,
-    metalness: 0.12,
-    side: THREE.DoubleSide,
-    emissive: new THREE.Color('#ff5c38'),
-    emissiveIntensity: 0
-  });
-
-  const streaks = [];
-  /* Adds a solid ribbon along `pts` plus a slightly larger additive shell for light streaks. */
-  function addRibbon(parent, pts, thick, width, streakOpts) {
-    const mesh = new THREE.Mesh(ribbonGeometry(pts, thick, width), ribbonMat);
-    parent.add(mesh);
-    if (streakOpts) {
-      const shellGeo = ribbonGeometry(pts, thick + 0.012, width + 0.012);
-      const mat = streakMaterial(shellGeo.userData.length, streakOpts.len || 2.2);
-      const shell = new THREE.Mesh(shellGeo, mat);
-      shell.renderOrder = 2;
-      mesh.add(shell);
-      streaks.push({
-        mat,
-        range: streakOpts.range || [0, 1],
-        dur: streakOpts.dur || 1.6,
-        start: Math.random() * 6
-      });
-    }
-    return mesh;
+  /* ---------- Stars ---------- */
+  const STARS = 1400;
+  const starPos = new Float32Array(STARS * 3);
+  const starSize = new Float32Array(STARS);
+  const starSeed = new Float32Array(STARS);
+  const starTint = new Float32Array(STARS);
+  for (let i = 0; i < STARS; i++) {
+    starPos[i * 3] = (rand() - 0.5) * 300;
+    starPos[i * 3 + 1] = (rand() - 0.5) * 200;
+    starPos[i * 3 + 2] = -40 - rand() * 260;
+    starSize[i] = 0.45 + Math.pow(rand(), 7) * 3.0;   // a few large, most small
+    starSeed[i] = rand() * Math.PI * 2;
+    starTint[i] = rand() < 0.12 ? 1 : 0;             // a handful pick up the brand red
   }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSize, 1));
+  starGeo.setAttribute('aSeed', new THREE.BufferAttribute(starSeed, 1));
+  starGeo.setAttribute('aTint', new THREE.BufferAttribute(starTint, 1));
 
-  /* ---------- Home: ribbon arches ---------- */
-  const home = new THREE.Group();
-  scene.add(home);
-  const LEG = 16;
-  const archSpecs = [
-    { rx: 2.7, h: 5.0 },
-    { rx: 2.5, h: 5.7 },
-    { rx: 2.3, h: 6.4 },
-    { rx: 2.1, h: 7.1 }
-  ];
-  const arches = archSpecs.map((s, i) => {
-    const pts = archPath(s.rx, s.h, LEG, 120);
-    const legFrac = (LEG * 0.55) / pathLength(pts);
-    const mesh = addRibbon(home, pts, 0.1, 1.05, { range: [legFrac, 1 - legFrac], len: 2.4, dur: 1.5 + i * 0.2 });
-    const base = new THREE.Vector3(i * 1.7, -3.4 + i * 0.3, -i * 1.9);
-    mesh.position.copy(base);
-    mesh.userData = { base, i };
-    return mesh;
-  });
-
-  /* ---------- Journey scene 2: slab field ---------- */
-  const slabs = new THREE.Group();
-  scene.add(slabs);
-  const rand = mulberry32(7);
-  for (let i = 0; i < 18; i++) {
-    const side = i % 2 === 0 ? -1 : 1;
-    const x = side * (2 + rand() * 7);
-    const pts = [];
-    for (let k = 0; k <= 40; k++) pts.push(new THREE.Vector2(0, -16 + (32 * k) / 40));
-    const m = addRibbon(slabs, pts, 0.14, 0.6 + rand() * 0.9, { len: 3, dur: 0.9 + rand() * 0.8 });
-    m.position.set(x, (rand() - 0.5) * 6, -34 - i * 2.6);
-    m.rotation.set((rand() - 0.5) * 0.3, (rand() - 0.5) * 0.8, 0.6 + (rand() - 0.5) * 0.25);
-  }
-
-  /* ---------- Journey scene 3: ring stack ---------- */
-  const rings = new THREE.Group();
-  rings.position.set(0, -6, -112);
-  rings.rotation.set(-1.05, 0, 0.35);
-  scene.add(rings);
-  [5.2, 4.4, 3.6, 2.8, 2.0, 1.2].forEach((r, i) => {
-    const m = addRibbon(rings, circlePath(r, 180), 0.22, 0.32 + i * 0.05, { len: 2.5, dur: 1.4 + i * 0.15 });
-    m.position.z = i * 0.75;
-  });
-  addRibbon(rings, circlePath(7.4, 220), 0.04, 0.05, { len: 5, dur: 2.2 });
-
-  /* ---------- Particles ---------- */
-  const P = 240;
-  const pPos = new Float32Array(P * 3);
-  const pSpeed = new Float32Array(P);
-  for (let i = 0; i < P; i++) {
-    pPos[i * 3] = (Math.random() - 0.5) * 40;
-    pPos[i * 3 + 1] = (Math.random() - 0.5) * 24;
-    pPos[i * 3 + 2] = 22 - Math.random() * 150;
-    pSpeed[i] = 0.15 + Math.random() * 0.55;
-  }
-  const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  const pMat = new THREE.PointsMaterial({
-    color: 0xff9a80,
-    size: 0.09,
-    map: dotTexture(),
+  const starMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uScale: { value: 700 },
+      uMap: { value: dotTexture() },
+      uCool: { value: new THREE.Color('#EFE7E4') },
+      uWarm: { value: new THREE.Color('#FF7A5C') }
+    },
+    vertexShader: `
+      attribute float aSize;
+      attribute float aSeed;
+      attribute float aTint;
+      uniform float uTime;
+      uniform float uScale;
+      varying float vAlpha;
+      varying float vTint;
+      void main() {
+        vTint = aTint;
+        vAlpha = 0.45 + 0.55 * sin(uTime * 0.7 + aSeed);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = aSize * uScale / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform sampler2D uMap;
+      uniform vec3 uCool;
+      uniform vec3 uWarm;
+      varying float vAlpha;
+      varying float vTint;
+      void main() {
+        float m = texture2D(uMap, gl_PointCoord).a;
+        vec3 c = mix(uCool, uWarm, vTint);
+        gl_FragColor = vec4(c, m * vAlpha);
+      }`,
     transparent: true,
-    opacity: 0.55,
     depthWrite: false,
     blending: THREE.AdditiveBlending
   });
-  scene.add(new THREE.Points(pGeo, pMat));
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
 
-  /* ---------- Camera path for the hold ---------- */
-  // Index 0 is the home view; positions and look-at targets are sampled along smooth curves.
-  const keys = [
-    { p: [0, 0, 20], look: [0, 0, 0] },
-    { p: [2.5, 1.2, 9], look: [5, -1, -3] },
-    { p: [5.5, 0.4, 0.5], look: [9, -1.5, -12] },
-    { p: [2, 1, -18], look: [0, 0, -40] },
-    { p: [0, 0.5, -38], look: [0, 0, -60] },
-    { p: [-0.5, 0, -62], look: [0, -3, -90] },
-    { p: [9, 7, -88], look: [0, -6, -112] },
-    { p: [5, 5, -97], look: [0, -6, -112] }
-  ];
-  const posCurve = new THREE.CatmullRomCurve3(keys.map((k) => new THREE.Vector3(...k.p)), false, 'centripetal');
-  const lookCurve = new THREE.CatmullRomCurve3(keys.map((k) => new THREE.Vector3(...k.look)), false, 'centripetal');
+  /* ---------- Cloud banks ----------
+     Each bank is one quad sampling a tiling noise texture at three scales, so it reads as
+     soft cloud rather than a repeating tile. Cheap: no noise maths in the shader. */
+  const noiseTex = noiseTexture(256, mulberry32(4));
+  noiseTex.wrapS = noiseTex.wrapT = THREE.RepeatWrapping;
+
+  const LAYERS = 9;
+  const clouds = [];
+  const cloudGeo = new THREE.PlaneGeometry(1, 1);
+  for (let i = 0; i < LAYERS; i++) {
+    const k = i / (LAYERS - 1);
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uMap: { value: noiseTex },
+        uOffset: { value: new THREE.Vector2(rand() * 10, rand() * 10) },
+        uDrift: { value: 0.006 + rand() * 0.012 },
+        uDensity: { value: 0.85 + rand() * 0.4 },
+        uOpacity: { value: 0.6 },
+        uDark: { value: new THREE.Color('#14090C') },
+        uLit: { value: new THREE.Color('#4A1512') },
+        uGlow: { value: new THREE.Color('#FF5C38') },
+        uGlowAmt: { value: 0.08 + rand() * 0.14 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`,
+      fragmentShader: `
+        uniform sampler2D uMap;
+        uniform vec2 uOffset;
+        uniform float uTime;
+        uniform float uDrift;
+        uniform float uDensity;
+        uniform float uOpacity;
+        uniform float uGlowAmt;
+        uniform vec3 uDark;
+        uniform vec3 uLit;
+        uniform vec3 uGlow;
+        varying vec2 vUv;
+        void main() {
+          vec2 p = vUv + uOffset;
+          float t = uTime * uDrift;
+          float n = texture2D(uMap, p * 1.0 + vec2(t, t * 0.3)).r * 0.55;
+          n += texture2D(uMap, p * 2.3 - vec2(t * 1.7, t * 0.5)).r * 0.3;
+          n += texture2D(uMap, p * 5.1 + vec2(t * 2.6, -t)).r * 0.15;
+          vec2 e = smoothstep(vec2(0.0), vec2(0.32), vUv) * smoothstep(vec2(0.0), vec2(0.32), 1.0 - vUv);
+          float edge = e.x * e.y;
+          float a = smoothstep(0.40, 0.78, n * uDensity + 0.10) * edge * uOpacity;
+          float lift = smoothstep(0.0, 0.75, 1.0 - vUv.y);
+          vec3 col = mix(uDark, uLit, lift);
+          col += uGlow * lift * uGlowAmt * n;
+          gl_FragColor = vec4(col, a);
+        }`,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    // Horizontal decks: the camera rises through them, so they read as cloud cover
+    const mesh = new THREE.Mesh(cloudGeo, mat);
+    const width = 260 + k * 420;
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.scale.set(width, width * 0.8, 1);
+    mesh.position.set((rand() - 0.5) * 60, -42 + i * 4.2 + (rand() - 0.5) * 1.8, -40 - k * 60);
+    mesh.userData = { base: mesh.position.clone(), i, k };
+    clouds.push(mesh);
+    scene.add(mesh);
+  }
 
   /* ---------- Taglines ---------- */
   const phrases = (hero.dataset.taglines || '').split('|').map((s) => s.trim()).filter(Boolean);
@@ -208,7 +201,6 @@ function init(hero) {
   }
 
   /* ---------- Layout ---------- */
-  const layout = { x: 2.8, y: -2.2 };
   let needsResize = true;
   function resize() {
     if (!needsResize) return;
@@ -219,10 +211,7 @@ function init(hero) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    const narrow = hero.clientWidth < 760;
-    layout.x = narrow ? -1.6 : 2.8;
-    layout.y = narrow ? -1.2 : -2.2;
-    home.scale.setScalar(narrow ? 1.05 : 2);
+    starMat.uniforms.uScale.value = renderer.getPixelRatio() * h * 0.6;
     if (reduced) render(0, 0);
   }
   const ro = new ResizeObserver(() => { needsResize = true; });
@@ -230,7 +219,7 @@ function init(hero) {
   ro.observe(canvas);
 
   /* ---------- Input ---------- */
-  let progress = 0; // smoothed fly-through progress, 0 = home view
+  let progress = 0;
   const pointer = { x: 0, y: 0 };
   const follow = { x: 0, y: 0 };
 
@@ -247,23 +236,18 @@ function init(hero) {
     pointer.y = 0;
   });
 
-  /* Scroll position relative to the runway.
-     path: 0 at the top of the page → 1 when the runway's last screen is reached.
-     exit: 0 → 1 over the next ~60% of a screen, as the following section scrolls in. */
   let played = false;
-  // Cached so the render loop never forces a layout; refreshed on scroll and resize.
   let endY = 0;
   function measure() {
-    if (!runway || played) return;
+    if (!runway || played || !runway.offsetHeight) return;
     endY = runway.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
   }
-  function runwayEnd() {
-    return endY;
-  }
+  function runwayEnd() { return endY; }
   window.addEventListener('resize', () => { needsResize = true; measure(); });
   measure();
+
   function scrollState() {
-    if (!runway || played) return { path: 0, exit: 1 };
+    if (!runway || played || endY <= 0) return { path: 0, exit: 1 };
     const end = runwayEnd();
     const y = window.scrollY;
     return {
@@ -272,18 +256,14 @@ function init(hero) {
     };
   }
 
-  // Third safety net: a jump (anchor link, End key) can skip the observer's threshold crossing.
   window.addEventListener('scroll', () => {
     measure();
     if (!played && runway && window.scrollY - runwayEnd() >= window.innerHeight) finish();
   }, { passive: true });
 
-  /* Once the runway has scrolled fully out of sight above the viewport, drop it so
-     scrolling back up shows the plain hero instead of replaying the fly-through.
-     The page is scrolled by the runway's own height, so nothing moves under the reader. */
   function finish() {
+    if (played || !runway || endY <= 0) return;
     played = true;
-    // Hold the next section still: note where it sits, collapse the runway, put it back.
     const anchor = runway.nextElementSibling || document.body;
     const before = anchor.getBoundingClientRect().top;
     runway.classList.remove('is-ready');
@@ -295,88 +275,44 @@ function init(hero) {
     const shift = anchor.getBoundingClientRect().top - before;
     const target = Math.max(0, window.scrollY + shift);
     window.scrollTo(0, target);
-    // Re-apply after layout settles: scroll anchoring can otherwise move the page.
     requestAnimationFrame(() => window.scrollTo(0, target));
   }
 
   /* ---------- Render ---------- */
-  const tmpPos = new THREE.Vector3();
-  const tmpLook = new THREE.Vector3();
-
   function render(t, dt) {
     const { path: raw, exit } = scrollState();
-    if (!played && runway && window.scrollY - runwayEnd() >= window.innerHeight) finish();
     progress += (raw - progress) * Math.min(1, dt * 5);
     if (Math.abs(raw - progress) < 0.0005) progress = raw;
-    const pathT = progress;
-    const p = easeInOut(pathT);
+    const p = easeInOut(progress);
     const journey = window.scrollY > 1 && exit < 1;
-    const homeWeight = 1 - smoothstep(0, 0.12, pathT);
-    const away = 1 - homeWeight;
 
-    // Cursor follow: strong at home, a subtle look-around during the journey
     const k = Math.min(1, dt * 3);
     follow.x += (pointer.x - follow.x) * k;
     follow.y += (pointer.y - follow.y) * k;
 
-    home.position.set(layout.x + follow.x * 2.6 * homeWeight, layout.y - follow.y * homeWeight, 0);
-    home.rotation.set(
-      0.06 + follow.y * 0.1 * homeWeight,
-      -0.8 + Math.sin(t * 0.12) * 0.06 + follow.x * 0.35 * homeWeight,
-      -0.3
-    );
-    arches.forEach((m) => {
-      const { base, i } = m.userData;
-      m.position.y = base.y + Math.sin(t * 0.5 + i * 0.9) * 0.12;
-      m.rotation.z = Math.sin(t * 0.3 + i) * 0.02;
+    // The climb: up through the banks, levelling out in clear sky
+    camera.position.set(follow.x * 1.6, -2 + p * 46 + follow.y * -1.2, 22 - p * 150);
+    camera.rotation.set(0.12 + p * 0.22 + follow.y * 0.04, follow.x * 0.06, Math.sin(t * 0.05) * 0.01 + p * 0.05);
+
+    clouds.forEach((c) => {
+      const { base, i } = c.userData;
+      c.material.uniforms.uTime.value = t;
+      c.position.y = base.y + Math.sin(t * 0.08 + i) * 0.35;
+      c.material.uniforms.uOpacity.value = 0.6 * (1 - smoothstep(0.6, 1, progress) * 0.9);
     });
-    rings.rotation.z = 0.35 + t * 0.08;
 
-    posCurve.getPointAt(p, tmpPos);
-    lookCurve.getPointAt(p, tmpLook);
-    tmpLook.x += follow.x * 3 * away;
-    tmpLook.y -= follow.y * 2 * away;
-    camera.position.copy(tmpPos);
-    camera.up.set(Math.sin(p * Math.PI * 1.2) * 0.25, 1, 0).normalize();
-    camera.lookAt(tmpLook);
-
-    ribbonMat.emissiveIntensity = away * 0.12;
-    pMat.opacity = 0.55 + away * 0.25;
-
-    // Particles drift up, and rush a little during the journey
-    const speed = 0.12 + away * 1.2;
-    for (let i = 0; i < P; i++) {
-      let y = pPos[i * 3 + 1] + pSpeed[i] * dt * speed;
-      if (y > 12) y = -12;
-      pPos[i * 3 + 1] = y;
-    }
-    pGeo.attributes.position.needsUpdate = true;
-
-    // Light streaks: occasional at home, frequent during the journey
-    streaks.forEach((s) => {
-      const u = (t - s.start) / s.dur;
-      if (u < 0) { s.mat.uniforms.uHead.value = -1; return; }
-      if (u > 1) {
-        s.start = t + (journey ? 0.2 + Math.random() * 1.2 : 2 + Math.random() * 6);
-        s.mat.uniforms.uHead.value = -1;
-        return;
-      }
-      const [a, b] = s.range;
-      s.mat.uniforms.uHead.value = a + (b - a + 0.1) * u;
-      s.mat.uniforms.uIntensity.value = 1.4 + away * 0.8;
-    });
+    starMat.uniforms.uTime.value = t;
+    stars.rotation.y = follow.x * 0.03 + t * 0.002;
 
     resize();
     renderer.render(scene, camera);
 
-    // Taglines
     words.forEach((w, i) => {
       const [a, b] = windows[i];
-      if (journey && exit < 0.05 && pathT >= a && pathT < b) setWord(w, 'in');
+      if (journey && exit < 0.05 && progress >= a && progress < b) setWord(w, 'in');
       else if (w.state === 'in') setWord(w, 'out');
     });
 
-    // Page chrome
     hero.classList.toggle('is-journey', journey);
     document.body.classList.toggle('is-journey', journey && exit < 0.5);
     const fade = journey ? String(1 - exit) : '';
@@ -392,8 +328,8 @@ function init(hero) {
   }
 
   if (runway) runway.classList.add('is-ready');
+  measure();
 
-  // Keep rendering while the hero or its scroll runway is on screen.
   const onScreen = new Set();
   let running = true;
   let last = performance.now();
@@ -415,7 +351,6 @@ function init(hero) {
     } else if (onScreen.size === 0) {
       running = false;
     }
-    // Scrolled clear of the runway: the fly-through is over.
     entries.forEach((en) => {
       if (en.target === runway && !en.isIntersecting && !played && window.scrollY > runwayEnd()) finish();
     });
@@ -425,4 +360,41 @@ function init(hero) {
 
   resize();
   requestAnimationFrame(frame);
+}
+
+/* A tiling value-noise texture, built once on a canvas so the shader stays cheap. */
+function noiseTexture(size, rnd) {
+  const grid = 32;
+  const pts = [];
+  for (let y = 0; y <= grid; y++) {
+    pts[y] = [];
+    for (let x = 0; x <= grid; x++) {
+      pts[y][x] = x === grid ? pts[y][0] : y === grid ? pts[0][x] : rnd();
+    }
+  }
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const img = ctx.createImageData(size, size);
+  const fade = (v) => v * v * (3 - 2 * v);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const gx = (x / size) * grid;
+      const gy = (y / size) * grid;
+      const x0 = Math.floor(gx);
+      const y0 = Math.floor(gy);
+      const fx = fade(gx - x0);
+      const fy = fade(gy - y0);
+      const v = (pts[y0][x0] * (1 - fx) + pts[y0][x0 + 1] * fx) * (1 - fy) +
+        (pts[y0 + 1][x0] * (1 - fx) + pts[y0 + 1][x0 + 1] * fx) * fy;
+      const i = (y * size + x) * 4;
+      const b = Math.round(v * 255);
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = b;
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.LinearSRGBColorSpace;
+  return tex;
 }
