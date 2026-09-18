@@ -29,7 +29,7 @@ One dark palette (Ember red) and one font set (Syne / Familjen Grotesk / Azeret 
 Night sky in `js/hero.js` (Three.js).
 - Idle: a deep star field (a few stars tinted with the brand red) above slow cloud decks, both leaning with the cursor.
 - Scrolling down climbs up through the cloud decks into clear sky on a full-screen stage, with three tagline phrases assembling letter by letter. Scrolling up rewinds; once past the end the runway collapses and it plays only once per visit.
-- Clouds are raymarched (like Vanta's clouds2): each pixel walks a ray through a slab of 3D noise and accumulates density, rendered at half resolution into a texture and drawn over the stars. Tune the step count, `density()` (slab height, scale, threshold) and the colours in `cloudMat`.
+- Clouds use Vanta.js CLOUDS2's shader (MIT, © 2019 Teng Bao), ported into our Three.js so the page only loads one copy of Three. Changed: transparent output so stars show through, a rising camera for the climb, and this site's colours. Rendered at ~55% resolution into a texture, then drawn over the stars. Tune `uCamY` (deck height), `uSpeed`, the 80-step loop, and `uCloud` / `uLight` / `uGlow`.
 - Tagline text: `data-taglines="Phrase one|Phrase two|Phrase three"` on the hero in `index.html`.
 Falls back to the CSS gradient (and no runway) without WebGL or for reduced-motion visitors.
 

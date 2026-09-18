@@ -114,84 +114,55 @@ function init(hero) {
     uniforms: {
       uNoise: { value: noiseTex },
       uTime: { value: 0 },
-      uAspect: { value: 1.6 },
+      uRes: { value: new THREE.Vector2(1, 1) },
       uCamY: { value: 0 },        // rises during the climb
       uPitch: { value: 0 },       // cursor tilt
-      uYaw: { value: 0 },
+      uSpeed: { value: 0.55 },
       uFade: { value: 1 },        // thins out once above the deck
-      uDeep: { value: new THREE.Color('#2A1C26') },
-      uLit: { value: new THREE.Color('#D8CBD2') },
+      uCloud: { value: new THREE.Color('#3A2A33') },
+      uLight: { value: new THREE.Color('#E9DDE3') },
       uGlow: { value: new THREE.Color('#FF5C38') }
     },
     vertexShader: `
-      varying vec2 vUv;
       void main() {
-        vUv = uv;
         gl_Position = vec4(position.xy, 0.0, 1.0);
       }`,
+    /* Cloud march adapted from Vanta.js CLOUDS2 (MIT) — Copyright (c) 2019 Teng Bao.
+       https://github.com/tengbao/vanta
+       Changed here: transparent output so the stars show through the gaps, a rising
+       camera for the scroll climb, and this site's colours. */
     fragmentShader: `
       precision highp float;
       uniform sampler2D uNoise;
-      uniform float uTime, uAspect, uCamY, uPitch, uYaw, uFade;
-      uniform vec3 uDeep, uLit, uGlow;
-      varying vec2 vUv;
+      uniform vec2 uRes;
+      uniform float uTime, uCamY, uPitch, uSpeed, uFade;
+      uniform vec3 uCloud, uLight, uGlow;
 
-      // 3D value noise from a 2D texture holding two neighbouring slices (r and g)
-      float noise3(vec3 p) {
-        vec3 i = floor(p);
-        vec3 f = fract(p);
-        f = f * f * (3.0 - 2.0 * f);
-        vec2 uv = (i.xz + vec2(37.0, 17.0) * i.y) + f.xz;
-        vec2 rg = texture2D(uNoise, (uv + 0.5) / 256.0).rg;
-        return mix(rg.x, rg.y, f.y);
-      }
-
-      float fbm(vec3 p) {
-        float v = 0.0, amp = 0.55;
-        for (int i = 0; i < 4; i++) {
-          v += noise3(p) * amp;
-          p *= 2.02;
-          amp *= 0.5;
-        }
-        return v;
-      }
-
-      // Density inside a slab of sky, thinning towards its top and bottom
-      float density(vec3 p) {
-        // a slab of cloud sitting below the eye
-        float h = smoothstep(-34.0, -24.0, p.y) * smoothstep(-6.0, -18.0, p.y);
-        if (h <= 0.0) return 0.0;
-        vec3 q = p * 0.085;
-        q.x += uTime * 0.004;
-        q.z += uTime * 0.002;
-        float d = fbm(q) - 0.34;
-        return clamp(d, 0.0, 1.0) * h;
-      }
+      #define T texture2D(uNoise, fract((s * p.zw + ceil(s * p.x)) / 200.0)).y / (s += s) * 4.0
 
       void main() {
-        vec2 uv = vUv * 2.0 - 1.0;
-        vec3 dir = normalize(vec3(uv.x * uAspect, uv.y * 0.62 + uPitch, -1.0));
-        dir.xz = mat2(cos(uYaw), -sin(uYaw), sin(uYaw), cos(uYaw)) * dir.xz;
-        vec3 ro = vec3(0.0, uCamY, 0.0);
-
-        vec4 acc = vec4(0.0);
-        float t = 6.0;
-        for (int i = 0; i < 34; i++) {
-          if (acc.a > 0.97) break;
-          vec3 p = ro + dir * t;
-          float d = density(p);
-          if (d > 0.001) {
-            // cheap shading: compare density a little above, so tops read lighter
-            float lift = clamp((d - density(p + vec3(0.0, 3.0, 0.0))) * 3.0, 0.0, 1.0);
-            vec3 col = mix(uDeep, uLit, clamp(lift * 3.0, 0.0, 1.0));
-            col += uGlow * 0.22 * smoothstep(0.02, 0.28, d) * (1.0 - lift);
-            float a = clamp(d * 7.0, 0.0, 1.0) * 0.5;
-            acc.rgb += (1.0 - acc.a) * col * a;
-            acc.a += (1.0 - acc.a) * a;
+        vec2 coord = gl_FragCoord.xy;
+        vec4 p, d = vec4(0.8, 0.0, coord / uRes.y - vec2(0.65, 0.65 + uPitch));
+        vec3 col = vec3(0.0);
+        float alpha = 0.0;
+        float s, f, t = 200.0 + sin(dot(coord, coord));
+        for (float i = 1.0; i <= 80.0; i += 1.0) {
+          t -= 2.0; if (t < 0.0) break;
+          p = 0.05 * t * d;
+          p.xz += uTime * 0.5 * uSpeed;          // drift
+          p.x += sin(uTime * 0.25 * uSpeed) * 0.25;
+          p.w += uCamY;                          // the climb
+          s = 2.0;
+          f = p.w + 1.0 - T - T - T - T;
+          if (f < 0.0) {
+            vec3 shade = mix(uLight, uCloud, -f);
+            shade += uGlow * 0.10 * clamp(-f, 0.0, 1.0);   // warm underside
+            float a = clamp(-f * 0.4, 0.0, 1.0);
+            col = mix(col, shade, a);
+            alpha = alpha + (1.0 - alpha) * a;
           }
-          t += 1.6 + t * 0.055;
         }
-        gl_FragColor = vec4(acc.rgb, acc.a * uFade);
+        gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0) * uFade);
       }`,
     transparent: true,
     depthTest: false,
@@ -272,8 +243,10 @@ function init(hero) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     starMat.uniforms.uScale.value = renderer.getPixelRatio() * h * 0.6;
-    cloudMat.uniforms.uAspect.value = w / h;
-    cloudTarget.setSize(Math.max(2, Math.round(w * 0.5)), Math.max(2, Math.round(h * 0.5)));
+    const cw = Math.max(2, Math.round(w * 0.55));
+    const ch = Math.max(2, Math.round(h * 0.55));
+    cloudTarget.setSize(cw, ch);
+    cloudMat.uniforms.uRes.value.set(cw, ch);
     if (reduced) render(0, 0);
   }
   const ro = new ResizeObserver(() => { needsResize = true; });
@@ -357,10 +330,9 @@ function init(hero) {
     camera.rotation.set(0.12 + p * 0.22 + follow.y * 0.04, follow.x * 0.06, Math.sin(t * 0.05) * 0.01 + p * 0.05);
 
     cloudMat.uniforms.uTime.value = t;
-    cloudMat.uniforms.uCamY.value = -6 + p * 34;
-    cloudMat.uniforms.uPitch.value = 0.12 + follow.y * 0.05 - p * 0.35;
-    cloudMat.uniforms.uYaw.value = follow.x * 0.12;
-    cloudMat.uniforms.uFade.value = 1 - smoothstep(0.62, 1, progress) * 0.95;
+    cloudMat.uniforms.uCamY.value = 0.62 + p * 1.5;                 // sit above the deck, then climb
+    cloudMat.uniforms.uPitch.value = follow.y * 0.04 - p * 0.28;
+    cloudMat.uniforms.uFade.value = 1 - smoothstep(0.6, 1, progress) * 0.95;
 
     starMat.uniforms.uTime.value = t;
     stars.rotation.y = follow.x * 0.03 + t * 0.002;
